@@ -1,0 +1,75 @@
+{
+	"behavior": {
+		"name": "demo",
+		"agenttype": "FirstAgent",
+		"version": "5",
+		"properties": [],
+		"node": {
+			"class": "DecoratorLoop",
+			"id": "1",
+			"properties": [{
+				"Count": "const int -1"
+			}, {
+				"DecorateWhenChildEnds": "true"
+			}, {
+				"DoneWithinFrame": "false"
+			}],
+			"children": [{
+				"node": {
+					"class": "Sequence",
+					"id": "0",
+					"properties": [],
+					"children": [{
+						"node": {
+							"class": "Action",
+							"id": "6",
+							"properties": [{
+								"Method": "Self.FirstAgent::Start()"
+							}, {
+								"ResultOption": "BT_SUCCESS"
+							}],
+							"children": []
+						}
+					}, {
+						"node": {
+							"class": "Assignment",
+							"id": "3",
+							"properties": [{
+								"CastRight": "false"
+							}, {
+								"Opl": "int Self.FirstAgent::p1"
+							}, {
+								"Opr": "const int 1"
+							}],
+							"children": []
+						}
+					}, {
+						"node": {
+							"class": "Condition",
+							"id": "2",
+							"properties": [{
+								"Operator": "Equal"
+							}, {
+								"Opl": "int Self.FirstAgent::p1"
+							}, {
+								"Opr": "const int 1"
+							}],
+							"children": []
+						}
+					}, {
+						"node": {
+							"class": "Action",
+							"id": "5",
+							"properties": [{
+								"Method": "Self.FirstAgent::Wait()"
+							}, {
+								"ResultOption": "BT_INVALID"
+							}],
+							"children": []
+						}
+					}]
+				}
+			}]
+		}
+	}
+}

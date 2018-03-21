@@ -63,6 +63,10 @@ function MyRobotClass:doLogPlayerInfo(param1, param2)
     return EBTStatus.BT_SUCCESS
 end
 
+function MyRobotClass:GetP1s1()
+    return tonumber(self.p1.s1)
+end
+
 assert(nil == _M)
 ----------------------------------------------------------------
 local myRobot = MyRobotClass.new()
@@ -77,9 +81,11 @@ local path_main = AgentMeta.getBehaviorTreePath("maintree")
 local path_sub = AgentMeta.getBehaviorTreePath("subtree")
 local path_maintree_task = AgentMeta.getBehaviorTreePath("maintree_task")
 local path_subtree_task = AgentMeta.getBehaviorTreePath("subtree_task")
-
 local path_LoopBattleBT = AgentMeta.getBehaviorTreePath("LoopBattleBT")
-myRobot:btSetCurrent(path_LoopBattleBT)
+local path_demo = AgentMeta.getBehaviorTreePath("demo")
+local path_StructBT = AgentMeta.getBehaviorTreePath("StructBT")
+
+myRobot:btSetCurrent(path_StructBT)
 
 local loopCount = 3
 for i= 1, loopCount do

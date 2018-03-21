@@ -1,5 +1,5 @@
---- Behaviac lib Component: node param wrapper.
--- @module NodeParam.lua
+--- Behaviac lib Component: param method and property wrapper.
+-- @module ParamAdapter.lua
 -- @author n.lee
 -- @copyright 2016
 -- @license MIT/X11
@@ -7,6 +7,7 @@
 -- Localize
 local pdir = (...):gsub('%.[^%.]+%.[^%.]+$', '') .. "."
 local cwd = (...):gsub('%.[^%.]+$', '') .. "."
+
 local unpack = unpack or table.unpack
 
 local enums = require(pdir .. "enums")
@@ -26,20 +27,26 @@ local constPropertyValueType    = enums.constPropertyValueType
 local Logging                   = common.d_log
 local StringUtils               = common.StringUtils
 
-local AgentMeta = require(pdir .. "agent.AgentMeta")
+-- Class
+local ParamAdapter = class("ParamAdapter")
+_G.ADD_BEHAVIAC_DYNAMIC_TYPE("ParamAdapter", ParamAdapter)
+local _M = ParamAdapter
 
+local AgentMeta = require(pdir .. "agent.AgentMeta")
+local ConstValueReader = require(pdir .. "parser.ConstValueReader")
+
+--------------------------------------------------------------------------------
+-- const
+--------------------------------------------------------------------------------
 local ConstVar = {
     constCharByteDoubleQuote     = string.byte('\"'),
     constCharByteLeftBracket     = string.byte('['),
     constCharByteRightBracket    = string.byte(']'),
     constCharByteLeftBraces      = string.byte('{'),
     constCharByteComma           = string.byte(","),
+    constCharByteColon           = string.byte(":"),
+    constCharByteSemicolon       = string.byte(";"),
 }
-
--- Class
-local NodeParam = class("NodeParam")
-_G.ADD_BEHAVIAC_DYNAMIC_TYPE("NodeParam", NodeParam)
-local _M = NodeParam
 
 --------------------------------------------------------------------------------
 -- Initialize
@@ -57,6 +64,9 @@ function _M:ctor()
     self.value = false
     self.setValue = false
     self.valueIsFunction = false
+    self.realTypeIsArray = false
+    self.realTypeIsStruct = false
+    self.realTypeName = false
     self.params = {}
 end
 
@@ -104,18 +114,90 @@ function _M:getValueFrom(agent, method)
     end
 end
 
+local function _compute(left, right, computeType)
+    -- TODO left, right类型检查
+    if type(left) ~= 'number' or type(right) ~= 'number' then
+        _G.BEHAVIAC_ASSERT(false)
+    else
+        if computeType == EOperatorType.E_ADD then
+            return left + right
+        elseif computeType == EOperatorType.E_SUB then
+            return left - right
+        elseif computeType == EOperatorType.E_MUL then
+            return left * right
+        elseif computeType == EOperatorType.E_DIV then
+            if right == 0 then
+                print('_compute() error!!! Divide right is zero.')
+                return left
+            end
+            return left / right
+        end
+    end
+    _G.BEHAVIAC_ASSERT(false)
+    return left
+end
+
 -- Compute(pAgent, pComputeNode->m_opr1, pComputeNode->m_opr2, pComputeNode->m_operator)
 function _M:compute(agent, opr1, opr2, operator)
     local r1 = opr1:getValue(agent)
     local r2 = opr2:getValue(agent)
-    local result = _M.compute(r1, r2, operator)
+    if opr1.realTypeIsStruct or opr2.realTypeIsStruct then
+        print("[_M:compute()] struct compute is not supported yet!!!", left, right)
+        return
+    end
+    local result = _compute(r1, r2, operator)
     self.setValue(agent, result)
+end
+
+local function _compare(left, right, operatorType)
+    if nil == left or nil == right then
+        print("_compare() failed!!! Left or right operand is nil --", left, right)
+        return false
+    else
+        if operatorType == EOperatorType.E_EQUAL then
+            return left == right
+        elseif operatorType == EOperatorType.E_NOTEQUAL then
+            return left ~= right
+        elseif operatorType == EOperatorType.E_GREATER then
+            return left > right
+        elseif operatorType == EOperatorType.E_GREATEREQUAL then
+            return left >= right
+        elseif operatorType == EOperatorType.E_LESS then
+            return left < right
+        elseif operatorType == EOperatorType.E_LESSEQUAL then
+            return left <= right
+        end
+        print("_compare() failed!!! Unknown operator type --", operatorType)
+        return false
+    end
+end
+
+local function _compareStruct(left, right, operatorType)
+    if nil == left or nil == right then
+        print("_compareStruct() failed!!! Left or right operand is nil --", left, right)
+        return false
+    else
+        if operatorType == EOperatorType.E_EQUAL then
+            for k, v in pairs(left) do
+                if v ~= right[k] then
+                    return false
+                end
+            end
+            return true
+        end
+        print("_compareStruct() failed!!! Unknown operator type --", operatorType)
+        return false
+    end
 end
 
 function _M:compare(agent, opr, operatorType)
     local l = self:getValue(agent)
     local r = opr:getValue(agent)
-    return _M.compare(l, r, operatorType)
+    if self.realTypeName == opr.realTypeName and (self.realTypeIsStruct or opr.realTypeIsStruct) then
+        return _compareStruct(l, r, operatorType)
+    else
+        return _compare(l, r, operatorType)
+    end
 end
 
 function _M:setTaskParams(agent, treeTask)
@@ -150,7 +232,7 @@ local function parseForParams(paramStr)
     local retProperties = {}
     if #params > 0 then
         for _, propStr in ipairs(params) do
-            local prop = NodeParam.new()
+            local prop = ParamAdapter.new()
             prop:buildProperty(propStr)
             table.insert(retProperties, prop)
         end
@@ -195,35 +277,25 @@ function _M:buildMethod(intanceName, className, methodName, paramStr)
 
 end
 
-local function splitTokens(str)
-    local ret = {}
-    if string.byte(str, 1, 1) == ConstVar.constCharByteDoubleQuote then
-        _G.BEHAVIAC_ASSERT(string.byte(str, -1, -1) == ConstVar.constCharByteDoubleQuote, "splitTokens string.byte(str, -1, -1) == constCharByteDoubleQuote")
-        table.insert(ret, str)
-        return ret
-    end
-    
-    local p = StringUtils.split(str, ' ')
-    local len = #p
-
-    if string.byte(p[len], -1, -1) == ConstVar.constCharByteRightBracket then
-        local b = string.find(p[len], '%[')
-        _G.BEHAVIAC_ASSERT(b, "splitTokens string.find(p[len], '%[')")
-        p[len] = string.sub(v, 1, b-1)
-        p[len+1] = string.sub(v, b+1, -1)
-    end
-    return p
-end
-
 function _M:buildProperty(propertyStr)
-    self.isMethod     = false
+    self.isMethod = false
 
-    local tokens = splitTokens(propertyStr)
+    local tokens = StringUtils.splitTokens(propertyStr)
     if tokens[1] == "const" then
+        -- const type bulabula
         _G.BEHAVIAC_ASSERT(#tokens == 3, "_M.parseProperty #tokens == 3")
+
+        local typeName = tokens[2]
+        local valueStr = tokens[3]
+        local isArray = false
+        local isStruct = false
+
         self.type  = constPropertyValueType.const
-        self.value = common.readBasicType(tokens[2], tokens[3]) 
+        self.value, isArray, isStruct = ConstValueReader.readAnyType(typeName, valueStr) 
         self.valueIsFunction = false
+        self.realTypeIsArray = isArray
+        self.realTypeIsStruct = isStruct
+        self.realTypeName = typeName
     else
         local propStr       = ""
         local typeName      = ""
@@ -275,7 +347,6 @@ function _M:buildProperty(propertyStr)
             self.setValue = function(agent, value)
                 agent[propertyName] = value
             end
-            self.valueIsFunction = true
         else
             self.value = function(agent)
                 local other = AgentMeta.getInstance(intanceName, className)
@@ -287,8 +358,12 @@ function _M:buildProperty(propertyStr)
                     other[propertyName] = value
                 end
             end
-            self.valueIsFunction = true
         end
+
+        self.valueIsFunction = true
+        self.realTypeIsArray = false
+        self.realTypeIsStruct = false
+        self.realTypeName = typeName
     end
 
 end

@@ -125,9 +125,7 @@ end
 function _M:getReferencedTree()
     _G.BEHAVIAC_ASSERT(self.m_referencedBehavior, "[_M:getReferencedTree()] m_referencedBehavior")
     local treeName = self.m_referencedBehavior:getValue(agent)
-    if (string.byte(treeName, 1, 1) == string.byte("\"") and string.byte(treeName, -1, -1) == string.byte("\"")) then
-        treeName = string.sub(treeName, 2, -2)
-    end
+    treeName = StringUtils.trimEnclosedDoubleQuotes(treeName)
     return AgentMeta.getBehaviorTreePath(treeName)
  end
 

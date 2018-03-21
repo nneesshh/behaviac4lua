@@ -33,6 +33,7 @@ local _M = BehaviorTree
 
 local NodeParser = require(pdir .. "parser.NodeParser")
 local NodeLoader = require(pdir .. "parser.NodeLoader")
+local ConstValueReader = require(pdir .. "parser.ConstValueReader")
 
 local AgentMeta = require(pdir .. "agent.AgentMeta")
 
@@ -137,7 +138,7 @@ function _M:loadLocal(version, agentType, parNode)
 end
 
 function _M:addLocal(agentType, typeName, name, valueStr)
-    self.m_localProps[name] = common.readBasicType(typeName, valueStr)
+    self.m_localProps[name] = ConstValueReader.readAnyType(typeName, valueStr)
 end
 
 function _M:addPar(agentType, typeName, name, valueStr)

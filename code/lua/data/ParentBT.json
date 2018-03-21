@@ -1,0 +1,135 @@
+{
+	"behavior": {
+		"name": "ParentBT",
+		"agenttype": "FirstAgent",
+		"version": "5",
+		"properties": [],
+		"node": {
+			"class": "Selector",
+			"id": "1",
+			"properties": [],
+			"children": [{
+				"node": {
+					"class": "Sequence",
+					"id": "3",
+					"properties": [],
+					"children": [{
+						"node": {
+							"class": "Compute",
+							"id": "7",
+							"properties": [{
+								"Operator": "Mul"
+							}, {
+								"Opl": "int Self.FirstAgent::p1"
+							}, {
+								"Opr1": "const int 3"
+							}, {
+								"Opr2": "const int 5"
+							}],
+							"children": []
+						}
+					}, {
+						"node": {
+							"class": "Action",
+							"id": "4",
+							"properties": [{
+								"Method": "Self.FirstAgent::Say(\"Hello Parent!\")"
+							}, {
+								"ResultOption": "BT_SUCCESS"
+							}],
+							"children": []
+						}
+					}]
+				}
+			}, {
+				"node": {
+					"class": "Sequence",
+					"id": "2",
+					"properties": [],
+					"children": [{
+						"node": {
+							"class": "Assignment",
+							"id": "5",
+							"properties": [{
+								"CastRight": "false"
+							}, {
+								"Opl": "int Self.FirstAgent::p1"
+							}, {
+								"Opr": "const int 6"
+							}],
+							"children": []
+						}
+					}, {
+						"node": {
+							"class": "Condition",
+							"id": "6",
+							"properties": [{
+								"Operator": "Greater"
+							}, {
+								"Opl": "int Self.FirstAgent::p1"
+							}, {
+								"Opr": "const int 1"
+							}],
+							"children": []
+						}
+					}, {
+						"node": {
+							"class": "Action",
+							"id": "0",
+							"properties": [{
+								"Method": "Self.FirstAgent::Say(\"Hello Prefab!\")"
+							}, {
+								"ResultOption": "BT_SUCCESS"
+							}],
+							"children": []
+						}
+					}]
+				}
+			}, {
+				"node": {
+					"class": "Sequence",
+					"id": "8",
+					"properties": [],
+					"children": [{
+						"node": {
+							"class": "Assignment",
+							"id": "9",
+							"properties": [{
+								"CastRight": "false"
+							}, {
+								"Opl": "int Self.FirstAgent::p1"
+							}, {
+								"Opr": "const int 3"
+							}],
+							"children": []
+						}
+					}, {
+						"node": {
+							"class": "Condition",
+							"id": "10",
+							"properties": [{
+								"Operator": "Greater"
+							}, {
+								"Opl": "int Self.FirstAgent::p1"
+							}, {
+								"Opr": "const int 1"
+							}],
+							"children": []
+						}
+					}, {
+						"node": {
+							"class": "Action",
+							"id": "11",
+							"properties": [{
+								"Method": "Self.FirstAgent::Say(\"Hello Prefab!\")"
+							}, {
+								"ResultOption": "BT_SUCCESS"
+							}],
+							"children": []
+						}
+					}]
+				}
+			}]
+		}
+	}
+}
