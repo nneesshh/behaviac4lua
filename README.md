@@ -6,6 +6,7 @@ behaviac for lua with blackboard, tick and json
 
 - Using blackboard and tick instead of task
 - Add json plugin to help debug
+- Does not support Enum
 
 ## Special Thanks
 
