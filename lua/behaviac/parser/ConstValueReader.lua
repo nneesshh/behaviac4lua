@@ -60,6 +60,10 @@ local basic_type_value_read_func_ = {
     ["behaviac::EBTStatus"]     = function(str) return EBTStatus[str] end,
 }
 
+local function testIsStruct(valueStr)
+    return string.byte(valueStr, 1) == string.byte('{')
+end
+
 function _M.readAnyType(typeName, valueStr)
     local isArray = false
     local isStruct = false
@@ -78,9 +82,14 @@ function _M.readAnyType(typeName, valueStr)
     if f then
         return f(valueStr), isArray, isStruct
     else
-        -- it must be struct
-        isStruct = true
-        return _M.readStruct(typeName, valueStr), isArray, isStruct
+        -- it must be struct or enum
+        isStruct = testIsStruct(valueStr)
+        if isStruct then
+            return _M.readStruct(typeName, valueStr), isArray, isStruct
+        else
+            -- it is enum
+            return _M.readEnum(typeName, valueStr), isArray, isStruct
+        end
     end
 end
 
@@ -91,22 +100,29 @@ function _M.readStruct(typeName, valueStr)
         local key = expression[1]
         local val = expression[2]
         local strLen = string.len(val)
-        if strLen > 0 and string.byte(val, 1) == string.byte('{') then
-            retStruct[key] = _M.readStruct(typeName, val)
-        else
-            local isArray, posEnd, elements = StringUtils.checkArrayString(val, 1, strLen)
-            if isArray then
-                local arrayT = {}
-                for _, e in ipairs(elements) do
-                    table.insert(arrayT, _M.readStruct(typeName, e))
-                end
-                retStruct[key] = arrayT
+        if strLen > 0 then
+            if testIsStruct(val) then
+                retStruct[key] = _M.readStruct(typeName, val)
             else
-                retStruct[key] = val
+                -- test is struct array
+                local isArray, posEnd, elements = StringUtils.checkArrayString(val, 1, strLen)
+                if isArray then
+                    local arrayT = {}
+                    for _, e in ipairs(elements) do
+                        table.insert(arrayT, _M.readStruct(typeName, e))
+                    end
+                    retStruct[key] = arrayT
+                else
+                    retStruct[key] = val
+                end
             end
         end
     end
     return retStruct
+end
+
+function _M.readEnum(typeName, valueStr)
+    return AgentMeta.getEnum(typeName, valueStr)
 end
 
 return _M

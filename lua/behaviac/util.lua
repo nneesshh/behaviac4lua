@@ -7,16 +7,8 @@
 local lib_util = {}
 
 -- Localize
-local cwd   = (...):gsub('%.util$', '') .. "."
+local cwd = (...):gsub('%.[^%.]+$', '') .. "."
 local rand = math.random
-
-function isLinux()
-    return false
-end
-
-function isTest()
-    return true
-end
 
 local _M = lib_util
 _M.createUUID = function()

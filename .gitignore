@@ -1,0 +1,45 @@
+# Prerequisites
+*.d
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+/bin/Debug/redisservice.ilk
+/build/redisservice.dir/obj/Debug/redisservice.tlog/CL.command.1.tlog
+*.tlog
+*.log
+*.suo
+*.sln
+*.pdb
+*.user
+*.ilk
+*.db
+*.opendb
+/build/.vs/redisservice/v15/ipch/AutoPCH/1d800acded623c9b/REDISSERVICE.ipch
+/build/.vs/redisservice/v15/ipch/AutoPCH/402942203bad331b/KJREDISCLIENTCONN.ipch

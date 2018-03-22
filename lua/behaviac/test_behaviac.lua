@@ -12,6 +12,8 @@ function MyRobotClass:ctor(unit)
     dump(unit, "unit")
     MyRobotClass.super.ctor(self)
     self.unit = unit
+
+    self.count = 0
 end
 
 function MyRobotClass:doLogin()
@@ -52,14 +54,21 @@ function MyRobotClass:getDungeonPreTask()
     return 123456
 end
 
+
 function MyRobotClass:doTask(taskId)
-    print(taskId)
-    return EBTStatus.BT_SUCCESS
+    self.count = self.count + 1
+    if self.count >= 2 then
+        print("doTask...success")
+        self.count = 0
+        return EBTStatus.BT_SUCCESS
+    else
+        print("doTask...running")
+        return EBTStatus.BT_RUNNING
+    end
 end
 
 function MyRobotClass:doLogPlayerInfo(param1, param2)
-    print(param1)
-    print(param2)
+    print("doLogPlayerInfo...")
     return EBTStatus.BT_SUCCESS
 end
 
@@ -84,8 +93,10 @@ local path_subtree_task = AgentMeta.getBehaviorTreePath("subtree_task")
 local path_LoopBattleBT = AgentMeta.getBehaviorTreePath("LoopBattleBT")
 local path_demo = AgentMeta.getBehaviorTreePath("demo")
 local path_StructBT = AgentMeta.getBehaviorTreePath("StructBT")
+local path_EnumBT = AgentMeta.getBehaviorTreePath("EnumBT")
 
-myRobot:btSetCurrent(path_StructBT)
+AgentMeta.registerEnumType("FirstEnum", { e1 = 0, e2 = 1 })
+myRobot:btSetCurrent(path_LoopBattleBT)
 
 local loopCount = 3
 for i= 1, loopCount do

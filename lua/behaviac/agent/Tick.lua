@@ -86,7 +86,7 @@ function _M:execWithChildStatus(targetNode, agent, childStatus)
         else
             local tree = self:getTopManageBranchNode(targetNode)
             if tree then
-                tree:setCurrentVisitingNode(self, targetNode)
+                tree:markVisiting(self, targetNode)
             end
         end
     else

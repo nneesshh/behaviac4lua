@@ -269,10 +269,6 @@ function _M:init(tick)
 
     self:setStatus(tick, EBTStatus.BT_INVALID)
     self:setHasManagingParent(tick, false)
-
-    -- bookmark the current ticking node, it is different from m_activeChildIndex
-    self:setCurrentVisitingNodeId(tick, -1)
-    self:setCurrentVisitingNode(tick, false)
 end
 
 -- return false if the event handling  needs to be stopped
@@ -405,20 +401,12 @@ function _M:getHasManagingParent(tick)
     return tick:getNodeMem("hasManagingParent", self)
 end
 
-function _M:setCurrentVisitingNodeId(tick, id)
-    tick:setNodeMem("currentVisitingNodeId", id, self)
-end
-
-function _M:getCurrentVisitingNodeId(tick)
-    return tick:getNodeMem("currentVisitingNodeId", self)
-end
-
 function _M:setCurrentVisitingNode(tick, visitingNode)
-    tick:setNodeMem("currentVisitingNode", visitingNode, self)
+    -- do nothing except branch
 end
 
 function _M:getCurrentVisitingNode(tick)
-    return tick:getNodeMem("currentVisitingNode", self)
+    -- do nothing except branch
 end
 
 return _M

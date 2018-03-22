@@ -7,8 +7,7 @@
 local _M = {
     _agentMetas = {},
     _agentInstances = {},
-    
-    _eventMethods = {},
+    _agentEnums = {},
 
     _behaviorTreeFolder = "./lua/data/"
 }
@@ -43,12 +42,18 @@ function _M.getInstance(intanceName, className)
     return instance
 end
 
-function _M.registerEventMethod(methodIdCrc32, method)
-    _M._eventMethods[methodIdCrc32] = method
+function _M.registerEnumType(enumTypeName, enumType)
+    _M._agentEnums[enumTypeName] = enumType
 end
 
-function _M.getEventMethod(methodIdCrc32)
-    return _M._eventMethods[methodIdCrc32]
+function _M.getEnum(enumTypeName, enumName)
+    local enumType = _M._agentEnums[enumTypeName]
+    if not enumType then
+        print(enumTypeName .. " error: enum meta not found!!!")
+    elseif not enumType[enumName] then
+        print(enumTypeName .. "." .. enumName .. " error: enum name not found!!!")
+    end
+    return enumType and enumType[enumName] or 0
 end
 
 function _M.setBehaviorTreeFolder(folderName)

@@ -54,6 +54,9 @@ end
 
 function _M:init(tick)
     _M.super.init(self, tick)
+
+    -- bookmark the current ticking node, it is different from m_activeChildIndex
+    self:setCurrentVisitingNode(tick, false)
 end
 
 function _M:onEvent(agent, tick, eventName, eventParams)
@@ -116,17 +119,16 @@ function _M:updateCurrent(agent, tick, childStatus)
     local status = EBTStatus.BT_INVALID
     local curVisitingNode = self:getCurrentVisitingNode(tick)
     if curVisitingNode then
-        return self:execCurrentVisitingNode(agent, tick, childStatus)
+        return self:execCurrentVisitingNode(curVisitingNode, agent, tick, childStatus)
     else
         return self:update(agent, tick, childStatus)
     end
 end
 
-function _M:execCurrentVisitingNode(agent, tick, childStatus)
-    local curVisitingNode = self:getCurrentVisitingNode(tick)
+function _M:execCurrentVisitingNode(curVisitingNode, agent, tick, childStatus)
     _G.BEHAVIAC_ASSERT(curVisitingNode)
     if curVisitingNode:getStatus(tick) ~= EBTStatus.BT_RUNNING then
-        Logging.error("[_M:execCurrentVisitingNode()] curVisitingNode status (%d) is not running", curVisitingNode:getStatus(tick))
+        Logging.error("[_M:execCurrentVisitingNode()] selfNode(%d)curVisitingNode(%d) status (%d) is not running", self:getId(), curVisitingNode:getId(), curVisitingNode:getStatus(tick))
         return EBTStatus.BT_FAILURE
     end
 
@@ -194,13 +196,13 @@ end
 
 -- See behaviortree_task.cpp
 --     void BranchTask::SetCurrentTask(BehaviorTask* task)
-function _M:setCurrentVisitingNode(tick, visitingNode)
+function _M:markVisiting(tick, visitingNode)
     local pLastVisitingNode = self:getCurrentVisitingNode(tick)
     if visitingNode then
         -- if the leaf node is running, then the leaf's parent node is also as running,
         -- the leaf is set as the tree's current task instead of its parent
         if not pLastVisitingNode then
-            _M.super.setCurrentVisitingNode(self, tick, visitingNode)
+            _M.setCurrentVisitingNode(self, tick, visitingNode)
 
             -- print("node", visitingNode.__name)
             visitingNode:setHasManagingParent(tick, true)
@@ -208,9 +210,17 @@ function _M:setCurrentVisitingNode(tick, visitingNode)
     else
         local status = self:getStatus(tick)
         if status ~= EBTStatus.BT_RUNNING then
-            _M.super.setCurrentVisitingNode(self, tick, visitingNode)
+            _M.setCurrentVisitingNode(self, tick, visitingNode)
         end
     end
+end
+
+function _M:setCurrentVisitingNode(tick, visitingNode)
+    tick:setNodeMem("currentVisitingNode", visitingNode, self)
+end
+
+function _M:getCurrentVisitingNode(tick)
+    return tick:getNodeMem("currentVisitingNode", self)
 end
 
 return _M
