@@ -117,7 +117,7 @@ local function to_double(value)
     mantissa = (value * flag - 1) * math.pow(2, mantissa_length)
     exponent = exponent + bias
   else -- Very tiny
-    mantissa = value * math.pow(2, bias - 1) * math.pow(2, mantissa_length);
+    mantissa = value * math.pow(2, bias - 1) * math.pow(2, mantissa_length)
     exponent = 0
   end
 
@@ -127,7 +127,7 @@ local function to_double(value)
     mantissa_length = mantissa_length - 8
   end
   
-  exponent = math.floor(exponent * math.pow(2, mantissa_length) + mantissa);
+  exponent = math.floor(exponent * math.pow(2, mantissa_length) + mantissa)
   exponent_length = exponent_length + mantissa_length;
   
   while exponent_length > 0  do
@@ -136,7 +136,7 @@ local function to_double(value)
     exponent_length = exponent_length - 8
   end
   
-  float64[8] = float64[8] + (sign * 128);
+  float64[8] = float64[8] + (sign * 128)
 
   for i, value in pairs(float64) do
     buffer = buffer .. string.char(value)

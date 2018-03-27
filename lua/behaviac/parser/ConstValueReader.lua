@@ -14,7 +14,8 @@ local enums = require(pdir .. "enums")
 local common = require(pdir .. "common")
 local AgentMeta = require(pdir .. "agent.AgentMeta")
 
-local StringUtils               = common.StringUtils
+local constCharByte = enums.constCharByte
+local StringUtils = common.StringUtils
 
 --------------------------------------------------------------------------------
 -- Basic type reader
@@ -61,7 +62,7 @@ local basic_type_value_read_func_ = {
 }
 
 local function testIsStruct(valueStr)
-    return string.byte(valueStr, 1) == string.byte('{')
+    return string.byte(valueStr, 1) == constCharByte.LeftBraces
 end
 
 function _M.readAnyType(typeName, valueStr)

@@ -14,28 +14,58 @@ local lib_loader = require(cwd .. "loader")
 
 _M.btCache = {} 
 
-function _M.preloadBehaviorTree(path)
+function _M.preloadBehaviorTree(pathBase)
     local NodeFactory = require(cwd .. "NodeFactory")
     local bt = nil
-    if _M.btCache[path] then
-        bt = _M.btCache[path]
+    if _M.btCache[pathBase] then
+        bt = _M.btCache[pathBase]
     else
-        local BehaviorTree = NodeFactory.BehaviorTree
-        bt = BehaviorTree.new()
-
-        local treeData, fileType = lib_loader.load(path)
+        local treeData, fileType = lib_loader.load(pathBase)
         if not treeData then
-            Logging.error("[_M:preloadBehaviorTree()] load file(%s) failed!!!", path)
+            Logging.error("[_M:preloadBehaviorTree()] load file(%s) failed!!!", pathBase)
             return
         end
 
+        local BehaviorTree = NodeFactory.BehaviorTree
+        bt = BehaviorTree.new()
+
         if lib_loader.FILE_TYPE_BSON_BYTES == fileType then 
-            bt:loadBson(treeData, path)
+            bt:loadBson(treeData, pathBase)
         elseif lib_loader.FILE_TYPE_JSON == fileType or lib_loader.FILE_TYPE_LUA == fileType then
-            bt:load(treeData, path)
+            bt:load(treeData, pathBase)
         end
-        _M.btCache[path] = bt
+        _M.btCache[pathBase] = bt
     end
+    return bt
+end
+
+function _M.loadBehaviorTree(path)
+    local treeData = nil
+    local extensionName, fileType, loadFunc, pathBase = lib_loader.testFileType(path)
+    if extensionName then
+        treeData = loadFunc(path)
+    else
+        pathBase = path
+        treeData, fileType = lib_loader.load(pathBase)
+    end
+
+    if not treeData then
+        Logging.error("[_M:preloadBehaviorTree()] load file(%s) failed!!!", path)
+        return
+    end
+
+    local NodeFactory = require(cwd .. "NodeFactory")
+    local BehaviorTree = NodeFactory.BehaviorTree
+    local bt = BehaviorTree.new()
+
+    if lib_loader.FILE_TYPE_BSON_BYTES == fileType then 
+        bt:loadBson(treeData, pathBase)
+    elseif lib_loader.FILE_TYPE_JSON == fileType or lib_loader.FILE_TYPE_LUA == fileType then
+        bt:load(treeData, pathBase)
+    end
+
+    --
+    _M.btCache[pathBase] = bt
     return bt
 end
 

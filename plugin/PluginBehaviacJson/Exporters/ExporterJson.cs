@@ -536,7 +536,8 @@ namespace PluginBehaviacJson.Exporters
 
                 // pretty print
                 string sPrettyPrint = JsonConvert.SerializeObject(root, Formatting.Indented);
-                using (StreamWriter sw = new StreamWriter(filename, false, Encoding.UTF8))
+                Encoding utf8WithoutBom = new UTF8Encoding(false);
+                using (StreamWriter sw = new StreamWriter(filename, false, utf8WithoutBom))
                 {
                     sw.Write(sPrettyPrint);
                     sw.Close();

@@ -48,16 +48,16 @@ function _M:ctor()
     self.m_referencedBehavior  = false
     self.m_referencedTreePath  = ""
 
-    self.m_task                = false
+    self.m_taskPrototype                = false
     self.m_transitions         = false
-    self.m_taskNode            = false
+    self.m_taskPrototypeNode            = false
 end
 
 function _M:release()
     _M.super.release(self)
 
     self.m_referencedBehavior  = false
-    self.m_task                = false
+    self.m_taskPrototype                = false
 end
 
 function _M:onLoading(version, agentType, properties)
@@ -96,37 +96,37 @@ function _M:onLoading(version, agentType, properties)
             end
         elseif nil ~= taskStr then
             _G.BEHAVIAC_ASSERT(not StringUtils.isNullOrEmpty(taskStr))
-            self.m_task = NodeParser.parseMethod(taskStr)
+            self.m_taskPrototype = NodeParser.parseTaskPrototype(taskStr)
         else
             -- _G.BEHAVIAC_ASSERT(0, "unrecognized property")
         end
     end
 end
 
-function _M:setTaskParams(agent, treeTick)
-    if self.m_task then
-        self.m_task:setTaskParams(agent, treeTick)
+function _M:setTaskParams(agent)
+    if self.m_taskPrototype then
+        self.m_taskPrototype:setTaskParams(agent)
     end
 end
 
 --See: referencebehavior.cpp
 --     Task* ReferencedBehavior::RootTaskNode(Agent* pAgent)
 function _M:rootTaskNode(agent)
-    if not self.m_taskNode then
+    if not self.m_taskPrototypeNode then
         local bt = BehaviorTreeFactory.preloadBehaviorTree(self.m_referencedTreePath)
 
         if bt and bt:getChildrenCount() == 1 then
-            self.m_taskNode = bt:getChild(1)
+            self.m_taskPrototypeNode = bt:getChild(1)
         end
     end
 
-    return self.m_taskNode
+    return self.m_taskPrototypeNode
 end
 
 function _M:getReferencedTree()
     _G.BEHAVIAC_ASSERT(self.m_referencedBehavior, "[_M:getReferencedTree()] m_referencedBehavior")
     local treeName = self.m_referencedBehavior:getValue(agent)
-    treeName = StringUtils.trimEnclosedDoubleQuotes(treeName)
+    _, treeName = StringUtils.trimEnclosedDoubleQuotes(treeName)
     return AgentMeta.getBehaviorTreePath(treeName)
  end
 
@@ -160,7 +160,6 @@ function _M:init(tick)
     self:setSubTreeTick(tick, false)
 end
 
-
 function _M:onEvent(agent, tick, eventName, eventParams)
     local status = self:getStatus(tick)
     if status == EBTStatus.BT_RUNNING and self:hasEvents() then
@@ -186,7 +185,7 @@ function _M:onEnter(agent, tick)
     if szTreePath and (not pSubBt or not StringUtils.compare(szTreePath, pSubBt:getRelativePath(), true)) then
         subTreeTick = agent:btCreateTreeTick(szTreePath)
         self:setSubTreeTick(tick, subTreeTick)
-        self:setTaskParams(tick, subTreeTick)
+        self:setTaskParams(agent)
     elseif subTreeTick then
         subTreeTick:reset(pSubBt, agent)
     end

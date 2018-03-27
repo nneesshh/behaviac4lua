@@ -110,7 +110,7 @@ function _M:switchTo(agent, tick, eventParams)
         if nil ~= agent then
             local tm = self:getTriggerMode()
             agent:btEventTree(self.m_referencedTreePath, tm)
-            agent:addLocalVariables(eventParams)
+            agent.m_blackboard:addLocalVariables(eventParams)
             agent:btExec()
         end
     end

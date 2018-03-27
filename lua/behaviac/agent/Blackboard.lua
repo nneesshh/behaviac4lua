@@ -38,16 +38,19 @@ function _M.s_getTreeNode(treeMem, key, nodeScope)
     return nodeMem[key]
 end
 
-function _M:setLocalVariable(varName, value) 
+function _M:setLocalVariable(varName, var) 
     local memory = self.m_baseMemory.localVars
-    memory[varName] = value
+    memory[varName] = var
 end
 
 function _M:addLocalVariables(vars)
-    if vars then
+    if #vars > 0 then
+        local varName, var
         local memory = self.m_baseMemory.localVars
-         for varName, value in pairs(vars) do
-            memory[varName] = value
+         for _, v in ipairs(vars) do
+            varName = v[1]
+            var = v[2]
+            memory[varName] = var
          end
     end
 end
@@ -99,7 +102,7 @@ function _M:set(key, value, treeScope, nodeScope)
 end
 
 function _M:get(key, treeScope, nodeScope) 
-    local mem = self:getMemory(treeScope, nodeScope);
+    local mem = self:getMemory(treeScope, nodeScope)
     return mem[key];
 end
 

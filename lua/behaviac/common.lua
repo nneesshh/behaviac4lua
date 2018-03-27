@@ -8,8 +8,11 @@ local _M = {}
 
 -- Localize
 local cwd = (...):gsub('%.[^%.]+$', '') .. "."
+local enums = require(cwd .. "enums")
 
 local lib_crc32 = require(cwd .. "external.CRC32")
+
+local constCharByte = enums.constCharByte
 
 --------------------------------------------------------------------------------
 -- log
@@ -47,32 +50,32 @@ function _M.StringUtils.compare(str1, str2, bIgnoreCase)
 end
 
 function _M.StringUtils.trimEnclosedDoubleQuotes(str)
-    if string.byte(str, 1, 1) == string.byte("\"") and string.byte(str, -1, -1) == string.byte("\"") then
-        return string.sub(str, 2, -2)
+    if string.byte(str, 1, 1) == constCharByte.DoubleQuote and string.byte(str, -1, -1) == constCharByte.DoubleQuote then
+        return true, string.sub(str, 2, -2)
     else
-        return str
+        return false, str
     end
 end
 
 function _M.StringUtils.trimEnclosedBrackets(str)
-    if string.byte(str, 1, 1) == string.byte("{") and string.byte(str, -1, -1) == string.byte("}") then
-        return string.sub(str, 2, -2)
+    if string.byte(str, 1, 1) == constCharByte.LeftBraces and string.byte(str, -1, -1) == constCharByte.RightBraces then
+        return true, string.sub(str, 2, -2)
     else
-        return str
+        return false, str
     end
 end
 
 function _M.StringUtils.skipPairedBrackets(str, startPos)
-    if string.byte(str, startPos) == string.byte('{') then
+    if string.byte(str, startPos) == constCharByte.LeftBraces then
         local depth = 0
         local posIt = startPos
         local strLen = string.len(str)
 
         while posIt <= strLen do
-            if string.byte(str, posIt) == string.byte('{') then
+            if string.byte(str, posIt) == constCharByte.LeftBraces then
                 depth = depth + 1
             
-            elseif string.byte(str, posIt) == string.byte('}') then
+            elseif string.byte(str, posIt) == constCharByte.RightBraces then
                 depth = depth - 1
                 if depth == 0 then
                     return posIt
@@ -102,8 +105,8 @@ end
 function _M.StringUtils.splitTokens(str)
     local ret = {}
     
-    if string.byte(str, 1, 1) == string.byte("\"") then
-        _G.BEHAVIAC_ASSERT(string.byte(str, -1, -1) == string.byte("\""), "splitTokens string.byte(str, -1, -1) == constCharByteDoubleQuote")
+    if string.byte(str, 1, 1) == constCharByte.DoubleQuote then
+        _G.BEHAVIAC_ASSERT(string.byte(str, -1, -1) == constCharByte.DoubleQuote, "splitTokens string.byte(str, -1, -1) == constCharByte.DoubleQuote")
         table.insert(ret, str)
         return ret
     end
@@ -118,21 +121,21 @@ function _M.StringUtils.splitTokens(str)
         local bFound = false
         local c = string.byte(str, i)
 
-        if c == string.byte(' ') and not bBeginIndex then
+        if c == constCharByte.WhiteSpace and not bBeginIndex then
             bFound = true
 
-        elseif c == string.byte('[') then
+        elseif c == constCharByte.LeftBracket then
             bBeginIndex = true
             bFound = true
 
-        elseif c == string.byte(']') then
+        elseif c == constCharByte.RightBracket then
             bBeginIndex = false
             bFound = true
         end
 
         if bFound then
             local strT = string.sub(str, pB, i - 1)
-            --//Debug.Check(strT.length() > 0);
+            --//Debug.Check(strT.length() > 0)
             _G.BEHAVIAC_ASSERT(string.len(strT) > 0)
             table.insert(ret, strT)
 
@@ -174,15 +177,15 @@ function _M.StringUtils.checkArrayString(str, posStart, posEnd)
 
         for posIt = mEnd_ + 1, strLen do
             local c1 = string.byte(str, posIt)
-            if c1 == string.byte(';') and depth == 0 then
+            if c1 == constCharByte.Semicolon and depth == 0 then
                 --//the last ';'
                 posEnd = posIt
                 break
-            elseif c1 == string.byte('{') then
+            elseif c1 == constCharByte.LeftBraces then
                 _G.BEHAVIAC_ASSERT(depth < 10)
                 depth = depth + 1
                 eStart = posIt
-            elseif c1 == string.byte('}') then
+            elseif c1 == constCharByte.RightBraces then
                 _G.BEHAVIAC_ASSERT(depth > 0)
                 depth = depth - 1
 
@@ -213,7 +216,7 @@ function _M.StringUtils.splitTokensForStruct(str)
     local isArray
 
     while posEnd do
-        _G.BEHAVIAC_ASSERT(string.byte(str, posEnd) == string.byte(';'))
+        _G.BEHAVIAC_ASSERT(string.byte(str, posEnd) == constCharByte.Semicolon)
 
         --//the last one might be empty
         if posEnd > posBegin then
@@ -224,7 +227,7 @@ function _M.StringUtils.splitTokensForStruct(str)
             local memmberValue
 
             local c = string.byte(str, posEqual + 1)
-            if c ~= string.byte('{') then
+            if c ~= constCharByte.LeftBraces then
                 --//to check if it is an array
                 isArray, posEnd = _M.StringUtils.checkArrayString(str, posEqual + 1, posEnd)
                 memmberValue = string.sub(str, posEqual + 1, posEnd - 1)

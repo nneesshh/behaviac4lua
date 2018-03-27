@@ -62,30 +62,39 @@ local constFileType = {
 	{ ".lua", _M.FILE_TYPE_LUA, load_lua },
 }
 
-function _M.getBehaviorTreeBaseName(treeName)
+function _M.testFileType(path)
+	local extensionName, fileType, loadFunc, pathBase
 	for _, v in ipairs(constFileType) do
-		local posStart, _ = string.find(treeName, v[1].."$")
+		extensionName = v[1]
+		fileType = v[2]
+		loadFunc = v[3]
+		local posStart, _ = string.find(path, extensionName.."$")
 		if posStart then
-			return string.sub(treeName, 1, posStart-1)
+			pathBase = string.sub(path, 1, posStart - 1)
+			return extensionName, fileType, loadFunc, pathBase
 		end
 	end
-	return treeName
+	return false, _M.FILE_TYPE_UNKNOWN
 end
 
-local function loadIter(t, index)
-
+local function try_load_by_auto_match_file_type(pathBase)
+	local data = nil
+	local extensionName, fileType, loadFunc
+	for _, v in ipairs(constFileType) do
+		extensionName = v[1]
+		fileType = v[2]
+		loadFunc = v[3]
+		data = loadFunc(pathBase .. extensionName)
+		if data then
+			return data, fileType
+		end
+	end
+	return false, _M.FILE_TYPE_UNKNOWN
 end
 
 -- Load 
-function _M.load(path)
-	local result = false
-	for _, v in ipairs(constFileType) do
-		result = v[3](path .. v[1])
-		if result then
-			return result, v[2]
-		end
-	end
-	return nil, _M.FILE_TYPE_UNKNOWN
+function _M.load(pathBase)
+	return try_load_by_auto_match_file_type(pathBase)
 end
 
 return _M

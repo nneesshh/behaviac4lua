@@ -35,8 +35,6 @@ local Tick = require(cwd .. "Tick")
 
 local BehaviorTreeFactory = require(pdir .. "parser.BehaviorTreeFactory")
 
-local BEHAVIAC_LOCAL_TASK_PARAM_PRE = "_$local_task_param_$_"
-
 --------------------------------------------------------------------------------
 -- Initialize
 --------------------------------------------------------------------------------
@@ -134,7 +132,7 @@ function _M:btExec_()
 end
 
 -- 
-function _M:_btSetCurrent(relativePath, triggerMode, byEvent)
+function _M:_btSetCurrent(relativeTreePath, triggerMode, byEvent)
     if self.m_currentTreeTick then
         if triggerMode == TriggerMode.TM_Return then
             -- if trigger mode is 'return', just push the current bt 'oldBt' on the stack and do nothing more
@@ -149,7 +147,7 @@ function _M:_btSetCurrent(relativePath, triggerMode, byEvent)
         elseif triggerMode == TriggerMode.TM_Transfer then
             -- don't use the bt stack to restore, we just abort the current one.
             -- as the bt node has onEnter/onExit, the abort can make them paired
-            --  //_G.BEHAVIAC_ASSERT(this->m_currentTreeTick->GetName() != relativePath);
+            --  //_G.BEHAVIAC_ASSERT(this->m_currentTreeTick->GetName() != relativeTreePath)
             local pBt = self.m_currentTreeTick:getBt()
             self.m_currentTreeTick:abort(pBt, self)
             self.m_currentTreeTick:reset(pBt, self)
@@ -160,7 +158,7 @@ function _M:_btSetCurrent(relativePath, triggerMode, byEvent)
     local pTick = false
     for _, tick in ipairs(self.m_behaviorTreeTicks) do
         _G.BEHAVIAC_ASSERT(tick)
-        if tick:getBt():getRelativePath(self) == relativePath then
+        if tick:getBt():getRelativePath(self) == relativeTreePath then
             pTick = tick
             break
         end
@@ -169,7 +167,7 @@ function _M:_btSetCurrent(relativePath, triggerMode, byEvent)
     local bRecursive = false
     if pTick then
         for _, item in ipairas(self.m_ttStack) do
-            if item.tt:getBt():getRelativePath() == relativePath then
+            if item.tt:getBt():getRelativePath() == relativeTreePath then
                 bRecursive = true
                 break
             end
@@ -182,7 +180,7 @@ function _M:_btSetCurrent(relativePath, triggerMode, byEvent)
     end
 
     if pTick == false or bRecursive then
-        pTick = self:btCreateTreeTick(relativePath)
+        pTick = self:btCreateTreeTick(relativeTreePath)
     end
 
     -- set current
@@ -190,17 +188,17 @@ function _M:_btSetCurrent(relativePath, triggerMode, byEvent)
     return pTick
 end
 
-function _M:btSetCurrent(relativePath)
-    return self:_btSetCurrent(relativePath, TriggerMode.TM_Transfer, false)
+function _M:btSetCurrent(relativeTreePath)
+    return self:_btSetCurrent(relativeTreePath, TriggerMode.TM_Transfer, false)
 end
 
-function _M:btReferenceTree(relativePath)
+function _M:btReferenceTree(relativeTreePath)
     self.m_referencetree = true
-    return self:_btSetCurrent(relativePath, TriggerMode.TM_Return, false)
+    return self:_btSetCurrent(relativeTreePath, TriggerMode.TM_Return, false)
 end
 
-function _M:btEventTree(relativePath, triggerMode)
-    return self:_btSetCurrent(relativePath, triggerMode, true)
+function _M:btEventTree(relativeTreePath, triggerMode)
+    return self:_btSetCurrent(relativeTreePath, triggerMode, true)
 end
 
 function _M:btOnEvent(eventName, eventParams)
@@ -210,8 +208,8 @@ function _M:btOnEvent(eventName, eventParams)
     end
 end
 
-function _M:btCreateTreeTick(relativePath)
-    local bt = BehaviorTreeFactory.preloadBehaviorTree(relativePath)
+function _M:btCreateTreeTick(relativeTreePath)
+    local bt = BehaviorTreeFactory.preloadBehaviorTree(relativeTreePath)
     local tick = Tick.new(bt, self.m_blackboard)
     tick:init()
     table.insert(self.m_behaviorTreeTicks, tick)
@@ -223,11 +221,11 @@ function _M:fireEvent(eventName, ...)
     local eventParams = {}
     
     for i, param in ipairs(args) do
-        local paramName = BEHAVIAC_LOCAL_TASK_PARAM_PRE .. tostring(i - 1)
-        eventParams[paramName] = param
+        local paramName = enums.BEHAVIAC_LOCAL_TASK_PARAM_PRE .. tostring(i - 1)
+        table.insert(eventParams, { paramName, param })
     end
 
-    self:btOnEvent(eventName, eventParams);
+    self:btOnEvent(eventName, eventParams)
 end
 
 function _M:getObjectTypeName()
@@ -257,18 +255,6 @@ end
 function _M:popExecutingTreeTick()
     self.m_executingTreeTick = self.m_lastExecutingTreeTick
     return self.m_executingTreeTick
-end
-
-function _M:setLocalVariable(varName, value)
-    self.m_blackboard:setLocalVariable(varName, value)
-end
-
-function _M:addLocalVariables(vars)
-    self.m_blackboard:addLocalVariables(vars)
-end
-
-function _M:getLocalVariable(varName)
-    return self.m_blackboard:getLocalVariable(varName)
 end
 
 return _M

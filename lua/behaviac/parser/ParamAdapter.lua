@@ -13,19 +13,11 @@ local unpack = unpack or table.unpack
 local enums = require(pdir .. "enums")
 local common = require(pdir .. "common")
 
-local EBTStatus                 = enums.EBTStatus
-local ENodePhase                = enums.ENodePhase
-local EPreconditionPhase        = enums.EPreconditionPhase
-local TriggerMode               = enums.TriggerMode
-local EOperatorType             = enums.EOperatorType
+local EOperatorType = enums.EOperatorType
+local constCharByte = enums.constCharByte
+local constPropertyValueType = enums.constPropertyValueType
 
-local constSupportedVersion     = enums.constSupportedVersion
-local constInvalidChildIndex    = enums.constInvalidChildIndex
-local constBaseKeyStrDef        = enums.constBaseKeyStrDef
-local constPropertyValueType    = enums.constPropertyValueType
-
-local Logging                   = common.d_log
-local StringUtils               = common.StringUtils
+local StringUtils = common.StringUtils
 
 -- Class
 local ParamAdapter = class("ParamAdapter")
@@ -34,19 +26,6 @@ local _M = ParamAdapter
 
 local AgentMeta = require(pdir .. "agent.AgentMeta")
 local ConstValueReader = require(pdir .. "parser.ConstValueReader")
-
---------------------------------------------------------------------------------
--- const
---------------------------------------------------------------------------------
-local ConstVar = {
-    constCharByteDoubleQuote     = string.byte('\"'),
-    constCharByteLeftBracket     = string.byte('['),
-    constCharByteRightBracket    = string.byte(']'),
-    constCharByteLeftBraces      = string.byte('{'),
-    constCharByteComma           = string.byte(","),
-    constCharByteColon           = string.byte(":"),
-    constCharByteSemicolon       = string.byte(";"),
-}
 
 --------------------------------------------------------------------------------
 -- Initialize
@@ -67,13 +46,12 @@ function _M:ctor()
     self.realTypeIsArray = false
     self.realTypeIsStruct = false
     self.realTypeName = false
-    self.params = {}
+    self.paramProperties = {}
 end
 
-local function unpackParams(agent, params)
-    -- agent is unused
+local function unpackParams(agent, paramProperties)
     local retValues = {}
-    for _, paramProp in ipairs(params) do
+    for _, paramProp in ipairs(paramProperties) do
         table.insert(retValues, paramProp:getValue(agent))
     end
     return unpack(retValues)
@@ -81,7 +59,7 @@ end
 
 function _M:run(agent)
     if self.isMethod and self.valueIsFunction then
-        self.value(agent, unpackParams(agent, self.params))
+        self.value(agent, unpackParams(agent, self.paramProperties))
     end
 end
 
@@ -95,8 +73,8 @@ function _M:getValue(agent)
     if not self.valueIsFunction then
         return self.value
     end
-    if self.params then
-        return self.value(agent, unpackParams(agent, self.params))
+    if self.paramProperties then
+        return self.value(agent, unpackParams(agent, self.paramProperties))
     else
         return self.value(agent)
     end
@@ -107,15 +85,14 @@ function _M:getValueFrom(agent, method)
     if not self.valueIsFunction then
         return self.value
     end
-    if self.params then
-        return self.value(agent, fp, unpackParams(agent, self.params))
+    if self.paramProperties then
+        return self.value(agent, fp, unpackParams(agent, self.paramProperties))
     else
         return self.value(agent, fp)
     end
 end
 
 local function _compute(left, right, computeType)
-    -- TODO left, right类型检查
     if type(left) ~= 'number' or type(right) ~= 'number' then
         _G.BEHAVIAC_ASSERT(false)
     else
@@ -200,52 +177,12 @@ function _M:compare(agent, opr, operatorType)
     end
 end
 
-function _M:setTaskParams(agent, treeTick)
-    print("_M:setTaskParams(agent, treeTick)")
-end
-
-local function parseForParams(paramStr)
-    local params = {}
-    
-    local startIndex = 1
-    local endIndex = #paramStr
-    local quoteDepth = 0
-
-    for i = startIndex, endIndex do
-        local b = string.byte(paramStr, i)
-        if ConstVar.constCharByteDoubleQuote == b then
-            quoteDepth = (quoteDepth + 1) % 2
-        elseif 0 == quoteDepth and ConstVar.constCharByteComma == b then
-            local s = string.trim(string.sub(paramStr, startIndex, i - 1))
-            table.insert(params, s)
-            startIndex = i + 1
-        end
-    end
-
-    -- the last param
-    if endIndex > startIndex then
-        local s = string.trim(string.sub(paramStr, startIndex, endIndex))
-        table.insert(params, s)
-    end
-
-    -- load properties from params
-    local retProperties = {}
-    if #params > 0 then
-        for _, propStr in ipairs(params) do
-            local prop = ParamAdapter.new()
-            prop:buildProperty(propStr)
-            table.insert(retProperties, prop)
-        end
-    end
-    return retProperties
-end
-
 function _M:buildMethod(intanceName, className, methodName, paramStr)
-    self.isMethod     = true
+    self.isMethod         = true
 
-    self.intanceName  = intanceName
-    self.paramName    = methodName
-    self.params       = parseForParams(paramStr)
+    self.intanceName      = intanceName
+    self.paramName        = methodName
+    self.paramProperties  = _M.s_createParamProperties(paramStr)
 
     local function methodIsNotImplementedYetError()
         print(intanceName .. "." .. className .. "::" .. methodName .. " --> error: method is not implemented yet!!!")
@@ -282,14 +219,23 @@ function _M:buildProperty(propertyStr)
 
     local tokens = StringUtils.splitTokens(propertyStr)
     if #tokens <= 1 then
-        -- return propertyStr directly because we don't pase
-        -- meta file, and we don't know the real type
+        -- we don't know the real type because we don't parse th meta file
+        -- so just regard it as eighter "string" or "number"
+        local typeName = "string"
+        local valueNum
+
+        local bQuote, valueStr = StringUtils.trimEnclosedDoubleQuotes(propertyStr)
+        if not bQuote then
+            valueNum = tonumber(valueStr)
+            typeName = valueNum and "number"
+        end
+        
         self.type  = constPropertyValueType.const
-        self.value = propertyStr
+        self.value = (typeName == "number" and valueNum) or valueStr
         self.valueIsFunction = false
         self.realTypeIsArray = false
         self.realTypeIsStruct = false
-        self.realTypeName = "string"
+        self.realTypeName = typeName
     else
         if tokens[1] == "const" then
             -- const type bulabula
@@ -351,7 +297,7 @@ function _M:buildProperty(propertyStr)
                     if val then
                         return val
                     else
-                        return agent:getLocalVariable(propertyName)
+                        return agent.m_blackboard:getLocalVariable(propertyName)
                     end
                 end
                 self.setValue = function(agent, value)
@@ -377,6 +323,49 @@ function _M:buildProperty(propertyStr)
         end
     end
 
+end
+
+--------------------------------------------------------------------------------
+-- Static
+--------------------------------------------------------------------------------
+
+local function parseForParams(paramStr)
+    local params = {}
+    
+    local startIndex = 1
+    local endIndex = #paramStr
+    local quoteDepth = 0
+
+    for i = startIndex, endIndex do
+        local b = string.byte(paramStr, i)
+        if constCharByte.DoubleQuote == b then
+            quoteDepth = (quoteDepth + 1) % 2
+        elseif 0 == quoteDepth and constCharByte.Comma == b then
+            local s = string.trim(string.sub(paramStr, startIndex, i - 1))
+            table.insert(params, s)
+            startIndex = i + 1
+        end
+    end
+
+    -- the last param
+    if endIndex >= startIndex then
+        local s = string.trim(string.sub(paramStr, startIndex, endIndex))
+        table.insert(params, s)
+    end
+    return params
+end
+
+function _M.s_createParamProperties(paramStr)
+    local retProperties = {}
+    local params = parseForParams(paramStr)
+    if #params > 0 then
+        for _, propStr in ipairs(params) do
+            local prop = _M.new()
+            prop:buildProperty(propStr)
+            table.insert(retProperties, prop)
+        end
+    end
+    return retProperties
 end
 
 return _M

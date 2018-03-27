@@ -191,21 +191,25 @@ function _M.loadNode(agentType, bsonTreeData, startPos, version)
     return newNode, nextPos
 end
 
+-- See: behaviortree.cpp
+--      void BehaviorTree::load_local(int version, const char* agentType, BsonDeserizer& d)
 function _M.loadLocal(selfNode, version, agentType, bsonTreeData, startPos)
     local docLen, nextPos = bson.readInt32(bsonTreeData, startPos)
-    local etype
-    etype, nextPos = bson.readByte(bsonTreeData, nextPos)
 
-    local name, nextPos = d.readString(bsonTreeData, nextPos)
-    local type, nextPos = d.readString(bsonTreeData, nextPos)
-    local value, nextPos = d.readString(bsonTreeData, nextPos)
+    local name, type, value
+    name, nextPos = bson.readString(bsonTreeData, nextPos)
+    type, nextPos = bson.readString(bsonTreeData, nextPos)
+    value, nextPos = bson.readString(bsonTreeData, nextPos)
 
     _M.addLocal(selfNode, agentType, type, name, value)
+
+    -- eat end of doc
+    nextPos = nextPos + 1
     return nextPos
 end
 
 function _M.addLocal(selfNode, agentType, typeName, name, valueStr)
-    selfNode.m_localProps[name] = ConstValueReader.readAnyType(typeName, valueStr)
+    table.insert(selfNode.m_localProps, { name, ConstValueReader.readAnyType(typeName, valueStr) })
 end
 
 function _M.addPar(selfNode, agentType, typeName, name, valueStr)

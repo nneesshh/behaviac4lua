@@ -15,6 +15,10 @@ local _M = {
 -- Localize
 local pdir = (...):gsub('%.[^%.]+%.[^%.]+$', '') .. "."
 local cwd = (...):gsub('%.[^%.]+$', '') .. "."
+local enums = require(pdir .. "enums")
+
+local constCharByte = enums.constCharByte
+
 local lib_loader = require(pdir .. "parser.loader")
 
 function _M.registerMeta(metaClassName, meta)
@@ -58,16 +62,20 @@ function _M.getEnum(enumTypeName, enumName)
 end
 
 function _M.setBehaviorTreeFolder(folderName)
-    if string.byte(folderName, -1, -1) ~= string.byte("/") then
-        folderName = folderName .. "/"
+    if string.byte(folderName, -1, -1) ~= constCharByte.Slash then
+        folderName = folderName .. string.char(constCharByte.Slash)
     end
 
     _M._behaviorTreeFolder = folderName
 end
 
 function _M.getBehaviorTreePath(treeName)
-    local baseName = lib_loader.getBehaviorTreeBaseName(treeName)
-    return _M._behaviorTreeFolder .. baseName
+    local _, _, _, treeBase = lib_loader.testFileType(treeName)
+    if treeBase then
+        return _M._behaviorTreeFolder .. treeBase
+    else
+        return _M._behaviorTreeFolder .. treeName
+    end
 end
 
 return _M

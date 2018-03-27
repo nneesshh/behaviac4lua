@@ -125,4 +125,25 @@ _M.constBsonElementType = {
     BT_ParameterElement = 35
 }
 
+_M.constCharByte = {
+    WhiteSpace       = string.byte(' '),
+    DoubleQuote      = string.byte('\"'),
+
+    LeftParentheses  = string.byte('('),
+    LeftParentheses  = string.byte(')'),
+    LeftBracket      = string.byte('['),
+    RightBracket     = string.byte(']'),
+    LeftBraces       = string.byte('{'),
+    RightBraces      = string.byte('}'),
+
+    Comma            = string.byte(","),
+    Colon            = string.byte(":"),
+    Semicolon        = string.byte(";"),
+
+    Slash            = string.byte("/"),
+    Backslash        = string.byte("\\"),
+}
+
+_M.BEHAVIAC_LOCAL_TASK_PARAM_PRE = "_$local_task_param_$_"
+
 return _M

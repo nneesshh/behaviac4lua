@@ -36,7 +36,7 @@ function print_table(t)
 	   end
 	end
     end
-    printTableHelper(t, "");
+    printTableHelper(t, "")
 end
 
 -- print_table(bson.decode(bsondoc1))

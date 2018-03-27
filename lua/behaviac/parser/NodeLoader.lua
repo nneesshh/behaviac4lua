@@ -195,7 +195,7 @@ function _M.loadLocal(selfNode, version, agentType, parNode)
 end
 
 function _M.addLocal(selfNode, agentType, typeName, name, valueStr)
-    selfNode.m_localProps[name] = ConstValueReader.readAnyType(typeName, valueStr)
+    table.insert(selfNode.m_localProps, { name, ConstValueReader.readAnyType(typeName, valueStr) })
 end
 
 function _M.addPar(selfNode, agentType, typeName, name, valueStr)

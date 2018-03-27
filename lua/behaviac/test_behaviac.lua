@@ -5,6 +5,7 @@ local b = require "behaviac"
 --local pressTestManager = require ("presstest.PressTestManager")--p.PressTestManager
 local EBTStatus = b.enums.EBTStatus
 local AgentMeta = b.AgentMeta
+local BehaviorTreeFactory = b.BehaviorTreeFactory
 
 local MyRobotClass = class("Robot", b.BaseAgent)
 
@@ -109,9 +110,12 @@ local path_EnumBT = AgentMeta.getBehaviorTreePath("EnumBT.bson.bytes")
 
 local path_islandBattle = AgentMeta.getBehaviorTreePath("islandBattle")
 
+-- force load
+BehaviorTreeFactory.loadBehaviorTree(path_maintree_task .. ".json")
+
 AgentMeta.registerEnumType("FirstEnum", { e1 = 0, e2 = 1 })
-myRobot:btSetCurrent(path_islandBattle)
---myRobot:btSetCurrent(path_maintree)
+--myRobot:btSetCurrent(path_islandBattle)
+myRobot:btSetCurrent(path_maintree_task)
 
 local loopCount = 3
 for i= 1, loopCount do

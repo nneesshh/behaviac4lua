@@ -172,6 +172,12 @@ end
 -- Blackboard:
 --------------------------------------------------------------------------------
 
+function _M:init(tick)
+    _M.super.init(self, tick)
+
+    self:instantiatePars(tick)
+end
+
 function _M:onEnter(agent, tick)
     agent:pushExecutingTreeTick(tick)
     return true
@@ -221,6 +227,12 @@ end
 
 function _M:resume(agent, tick, status)
     return _M.super.resumeBranch(self, agent, tick, status)
+end
+
+function _M:instantiatePars(tick)
+    if #self.m_localProps > 0 then
+        tick.m_blackboard:addLocalVariables(self.m_localProps)
+    end
 end
 
 function _M:setEndStatus(tick, status)

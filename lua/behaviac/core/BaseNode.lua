@@ -54,7 +54,6 @@ function _M:ctor()
     self.m_failureEffectors      = 0
     self.m_bothEffectors         = 0
 
-    self.m_localProps            = {}
     self.m_loaderCallback        = function() end
     self.m_nodeFactory           = require(pdir .. "parser.NodeFactory")
 end
@@ -266,7 +265,6 @@ end
 --------------------------------------------------------------------------------
 
 function _M:init(tick)
-
     self:setStatus(tick, EBTStatus.BT_INVALID)
     self:setHasManagingParent(tick, false)
 end

@@ -12,27 +12,36 @@ local cwd = (...):gsub('%.[^%.]+$', '') .. "."
 
 local enums = require(pdir .. "enums")
 local common = require(pdir .. "common")
+local ParamAdapter = require(cwd .. "ParamAdapter")
+local PrototypeAdapter = require(cwd .. "PrototypeAdapter")
 
 local EOperatorType             = enums.EOperatorType
 local StringUtils               = common.StringUtils
-
-local ParamAdapter = require(cwd .. "ParamAdapter")
 
 function _M.parseMethod(methodInfo)
     if StringUtils.isNullOrEmpty(methodInfo) then
         return nil, false
     end
 
-    -- self:funtionName(params)
-    -- _G:fff.fff()
-    -- local intanceName, methodName, paramStr = string.gmatch(methodInfo, "(.+):(.+)%((.+)%)")()
-    -- REDO:  Self.CBTPlayer::MoveAhead(0)
     local intanceName, className, methodName, paramStr = string.gmatch(methodInfo, "(.+)%.(.+)::(.+)%((.*)%)")()
-    _G.BEHAVIAC_ASSERT(intanceName and className and methodName, "_M.parseMethod " .. methodInfo)
-    -- print('>>>>>>>>parseMethod', intanceName, methodName, paramStr)
+    _G.BEHAVIAC_ASSERT(intanceName and className and methodName, "[_M.parseMethod()] " .. methodInfo)
+
     local method = ParamAdapter.new()
     method:buildMethod(intanceName, className, methodName, paramStr)
     return method, methodName
+end
+
+function _M.parseTaskPrototype(prototypeInfo)
+    if StringUtils.isNullOrEmpty(prototypeInfo) then
+        return nil, false
+    end
+
+    local prototypeName, paramStr = string.gmatch(prototypeInfo, "(.+%..+::.+)%((.*)%)")()
+    _G.BEHAVIAC_ASSERT(prototypeName, "[_M.parseTaskPrototype()] " .. prototypeInfo)
+
+    local prototype = PrototypeAdapter.new()
+    prototype:buildTaskPrototype(prototypeName, paramStr)
+    return prototype, prototypeName
 end
 
 function _M.parseProperty(propertyStr)
