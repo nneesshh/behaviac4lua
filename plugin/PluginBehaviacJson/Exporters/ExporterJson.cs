@@ -530,18 +530,18 @@ namespace PluginBehaviacJson.Exporters
             }
 
             // export to the file
-            using (StreamWriter sw = new StreamWriter(filename))
-            {
-                using (JsonTextWriter jsonWrtier = new JsonTextWriter(sw))
+            { 
+                JObject root = new JObject();
+                ExportBehavior(root, _node);
+
+                // pretty print
+                string sPrettyPrint = JsonConvert.SerializeObject(root, Formatting.Indented);
+                using (StreamWriter sw = new StreamWriter(filename, false, Encoding.UTF8))
                 {
-                    JObject root = new JObject();
-                    ExportBehavior(root, _node);
-                    root.WriteTo(jsonWrtier);
+                    sw.Write(sPrettyPrint);
+                    sw.Close();
                 }
-
-                sw.Close();
             }
-
             return SaveResult.Succeeded;
         }
     }
