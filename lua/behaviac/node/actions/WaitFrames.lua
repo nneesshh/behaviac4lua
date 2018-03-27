@@ -26,10 +26,10 @@ local StringUtils               = common.StringUtils
 
 -- Class
 -- Wait for the specified frames, and always return Running until exceeds count.
-local BaseNode = require(ppdir .. "core.BaseNode")
-local WaitFrames = class("WaitFrames", BaseNode)
+local Leaf = require(ppdir .. "core.Leaf")
+local WaitFrames = class("WaitFrames", Leaf)
 _G.ADD_BEHAVIAC_DYNAMIC_TYPE("WaitFrames", WaitFrames)
-_G.BEHAVIAC_DECLARE_DYNAMIC_TYPE("WaitFrames", "BaseNode")
+_G.BEHAVIAC_DECLARE_DYNAMIC_TYPE("WaitFrames", "Leaf")
 local _M = WaitFrames
 
 local NodeParser = require(ppdir .. "parser.NodeParser")

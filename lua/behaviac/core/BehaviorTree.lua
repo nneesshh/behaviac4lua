@@ -20,6 +20,7 @@ local constSupportedVersion     = enums.constSupportedVersion
 local constInvalidChildIndex    = enums.constInvalidChildIndex
 local constBaseKeyStrDef        = enums.constBaseKeyStrDef
 local constPropertyValueType    = enums.constPropertyValueType
+local constBsonElementType      = enums.constBsonElementType
 
 local Logging                   = common.d_log
 local StringUtils               = common.StringUtils
@@ -33,9 +34,10 @@ local _M = BehaviorTree
 
 local NodeParser = require(pdir .. "parser.NodeParser")
 local NodeLoader = require(pdir .. "parser.NodeLoader")
-local ConstValueReader = require(pdir .. "parser.ConstValueReader")
 
 local AgentMeta = require(pdir .. "agent.AgentMeta")
+local bson = require(pdir .. "external.bson")
+local BsonNodeLoader = require(pdir .. "parser.BsonNodeLoader")
 
 --------------------------------------------------------------------------------
 -- Initialize
@@ -101,11 +103,40 @@ function _M:isFSM()
     return self.m_bIsFSM
 end
 
+function _M:loadBson(bsonTreeData, behaviorTreePath)
+    -- behavior node
+    local etype, nextPos = bson.readByte(bsonTreeData, 1)
+    if constBsonElementType.BT_BehaviorElement ~= etype then
+        Logging.error("[_M:loadBson()] file(%s) is invalid!!!", behaviorTreePath)
+        return
+    end
+
+    local docLen, name, agentType, bFsm, version
+    docLen, nextPos = bson.readInt32(bsonTreeData, nextPos)
+    name, nextPos = bson.readString(bsonTreeData, nextPos)
+    agentType, nextPos = bson.readString(bsonTreeData, nextPos)
+    bFsm, nextPos = bson.readBool(bsonTreeData, nextPos)
+    version, nextPos = bson.readString(bsonTreeData, nextPos)
+
+    behaviorTreePath = behaviorTreePath or AgentMeta.getBehaviorTreePath(name)
+
+    self:setName(name)
+    self:setRelativePath(behaviorTreePath)
+    self:setClassNameString("BehaviorTree")
+    self:setId(0xffffffff)
+
+    self.m_bIsFSM = bFsm
+
+    --
+    nextPos = BsonNodeLoader.loadPropertiesParsAttachmentsChildren(self, version, agentType, bsonTreeData, nextPos, false)
+    return true
+end
+
 function _M:load(treeData, behaviorTreePath)
     -- behavior node
     local behaviorEntry = treeData[constBaseKeyStrDef.kStrBehavior]
     if not behaviorEntry then
-        Logging.error("[_M:load()] file(%s) is invalid!!!", path)
+        Logging.error("[_M:load()] file(%s) is invalid!!!", behaviorTreePath)
         return
     end
 
@@ -127,22 +158,6 @@ function _M:load(treeData, behaviorTreePath)
     --
     NodeLoader.loadPropertiesParsAttachmentsChildren(self, version, agentType, behaviorEntry)
     return true
-end
-
-function _M:loadLocal(version, agentType, parNode)
-    local name = parNode[constBaseKeyStrDef.kStrName]
-    local type = parNode[constBaseKeyStrDef.kStrType]
-    local value = parNode[constBaseKeyStrDef.kStrValue]
-
-    self:addLocal(agentType, type, name, value)
-end
-
-function _M:addLocal(agentType, typeName, name, valueStr)
-    self.m_localProps[name] = ConstValueReader.readAnyType(typeName, valueStr)
-end
-
-function _M:addPar(agentType, typeName, name, valueStr)
-    self:addLocal(agentType, typeName, name, valueStr)
 end
 
 function _M:isManagingChildrenAsSubTrees()

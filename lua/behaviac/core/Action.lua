@@ -29,10 +29,10 @@ local StringUtils               = common.StringUtils
 -- member function can be assigned to an action node, and will be invoked when the 
 -- action node ticked. Agent member function attached to action node can be up to 
 -- eight parameters most.
-local BaseNode = require(cwd .. "BaseNode")
-local Action = class("Action", BaseNode)
+local Leaf = require(cwd .. "Leaf")
+local Action = class("Action", Leaf)
 _G.ADD_BEHAVIAC_DYNAMIC_TYPE("Action", Action)
-_G.BEHAVIAC_DECLARE_DYNAMIC_TYPE("Action", "BaseNode")
+_G.BEHAVIAC_DECLARE_DYNAMIC_TYPE("Action", "Leaf")
 local _M = Action
 
 local NodeParser = require(pdir .. "parser.NodeParser")

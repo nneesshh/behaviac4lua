@@ -12,6 +12,8 @@ local cwd = (...):gsub('%.[^%.]+$', '') .. "."
 local enums = require(pdir .. "enums")
 local common = require(pdir .. "common")
 
+local ConstValueReader = require(pdir .. "parser.ConstValueReader")
+
 local EBTStatus                 = enums.EBTStatus
 local ENodePhase                = enums.ENodePhase
 local EPreconditionPhase        = enums.EPreconditionPhase
@@ -49,7 +51,7 @@ function _M.loadProperties(selfNode, version, agentType, dataEntry)
 end
 
 function _M.loadChildren(selfNode, version, agentType, dataEntry)
-    local hasEvents = selfNode:hasEvents()
+    local hasEvents = false
     local nodeEntry = nil
     local newNode = nil
     
@@ -82,7 +84,7 @@ function _M.loadPars(selfNode, version, agentType, dataEntry)
     end
 
     for _, oneParNode in ipairs(thisEntry) do
-        selfNode:loadLocal(version, agentType, oneParNode)
+        _M.loadLocal(selfNode, version, agentType, oneParNode)
     end
  end      
 
@@ -137,7 +139,7 @@ end
 
 --
 function _M.loadAttachments(selfNode, version, agentType, dataEntry, isTransition)
-    local hasEvents = selfNode:hasEvents()
+    local hasEvents = false
     local thisEntry = dataEntry[constBaseKeyStrDef.kStrAttachments]
     if not thisEntry then
         return
@@ -176,12 +178,28 @@ function _M.loadNode(agentType, dataEntry, version)
             local idStr = dataEntry[constBaseKeyStrDef.kStrId]
             _G.BEHAVIAC_ASSERT(idStr, "node = %s no id", agentType)
             newNode:setId(tonumber(idStr))
-            _M.loadPropertiesParsAttachmentsChildren(newNode, version, agentType, dataEntry, isTransition)
+            _M.loadPropertiesParsAttachmentsChildren(newNode, version, agentType, dataEntry, false)
         end
         return newNode
     end
 
     return nil
+end
+
+function _M.loadLocal(selfNode, version, agentType, parNode)
+    local name = parNode[constBaseKeyStrDef.kStrName]
+    local type = parNode[constBaseKeyStrDef.kStrType]
+    local value = parNode[constBaseKeyStrDef.kStrValue]
+
+    _M.addLocal(selfNode, agentType, type, name, value)
+end
+
+function _M.addLocal(selfNode, agentType, typeName, name, valueStr)
+    selfNode.m_localProps[name] = ConstValueReader.readAnyType(typeName, valueStr)
+end
+
+function _M.addPar(selfNode, agentType, typeName, name, valueStr)
+    _M.addLocal(selfNode, agentType, typeName, name, valueStr)
 end
 
 return _M

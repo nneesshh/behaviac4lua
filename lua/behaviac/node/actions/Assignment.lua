@@ -26,10 +26,10 @@ local StringUtils               = common.StringUtils
 
 -- Class
 -- Assign a right value to left par or agent property. a right value can be a par or agent property.
-local BaseNode = require(ppdir .. "core.BaseNode")
-local Assignment = class("Assignment", BaseNode)
+local Leaf = require(ppdir .. "core.Leaf")
+local Assignment = class("Assignment", Leaf)
 _G.ADD_BEHAVIAC_DYNAMIC_TYPE("Assignment", Assignment)
-_G.BEHAVIAC_DECLARE_DYNAMIC_TYPE("Assignment", "BaseNode")
+_G.BEHAVIAC_DECLARE_DYNAMIC_TYPE("Assignment", "Leaf")
 local _M = Assignment
 
 local NodeParser = require(ppdir .. "parser.NodeParser")

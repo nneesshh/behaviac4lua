@@ -28,10 +28,10 @@ local StringUtils               = common.StringUtils
 -- Compute the result of Operand1 and Operand2 and assign it to the Left Operand.
 -- Compute node can perform Add, Sub, Mul and Div operations. a left and right Operand
 -- can be a agent property or a par value.
-local BaseNode = require(ppdir .. "core.BaseNode")
-local Compute = class("Compute", BaseNode)
+local Leaf = require(ppdir .. "core.Leaf")
+local Compute = class("Compute", Leaf)
 _G.ADD_BEHAVIAC_DYNAMIC_TYPE("Compute", Compute)
-_G.BEHAVIAC_DECLARE_DYNAMIC_TYPE("Compute", "BaseNode")
+_G.BEHAVIAC_DECLARE_DYNAMIC_TYPE("Compute", "Leaf")
 local _M = Compute
 
 local NodeParser = require(ppdir .. "parser.NodeParser")

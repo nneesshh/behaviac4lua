@@ -35,6 +35,7 @@ local NodeParser = require(ppdir .. "parser.NodeParser")
 local BehaviorTreeFactory = require(ppdir .. "parser.BehaviorTreeFactory")
 
 local AgentMeta = require(ppdir .. "agent.AgentMeta")
+local State = require(ppdir .. "fsm.State")
 
 --------------------------------------------------------------------------------
 -- Initialize
@@ -83,11 +84,11 @@ function _M:onLoading(version, agentType, properties)
                 local bHasEvents = true
 
                 if not StringUtils.isNullOrEmpty(self.m_referencedTreePath) then
-                    local bt = BehaviorTreeFactory.preloadBehaviorTree(self.m_referencedTreePath)
+                    local refBt = BehaviorTreeFactory.preloadBehaviorTree(self.m_referencedTreePath)
 
-                    _G.BEHAVIAC_ASSERT(behaviorTree, "")
-                    if behaviorTree then
-                        bHasEvents = behaviorTree:hasEvents()
+                    _G.BEHAVIAC_ASSERT(refBt)
+                    if refBt then
+                        bHasEvents = refBt:hasEvents()
                     end
 
                     self.m_bHasEvents = self.m_bHasEvents or bHasEvents
@@ -102,9 +103,9 @@ function _M:onLoading(version, agentType, properties)
     end
 end
 
-function _M:setTaskParams(agent, treeTask)
+function _M:setTaskParams(agent, treeTick)
     if self.m_task then
-        self.m_task:setTaskParams(agent, treeTask)
+        self.m_task:setTaskParams(agent, treeTick)
     end
 end
 
@@ -181,12 +182,12 @@ function _M:onEnter(agent, tick)
     
     -- to create the task on demand
     local subTreeTick = self:getSubTreeTick(tick)
-    if szTreePath and (not subTreeTick or StringUtils.compare(szTreePath, subTreeTick:getRelativePath(), true)) then
+    local pSubBt = subTreeTick and subTreeTick:getBt()
+    if szTreePath and (not pSubBt or not StringUtils.compare(szTreePath, pSubBt:getRelativePath(), true)) then
         subTreeTick = agent:btCreateTreeTick(szTreePath)
         self:setSubTreeTick(tick, subTreeTick)
         self:setTaskParams(tick, subTreeTick)
     elseif subTreeTick then
-        local pSubBt = subTreeTick:getBt()
         subTreeTick:reset(pSubBt, agent)
     end
     return true
@@ -197,14 +198,15 @@ end
 
 function _M:update(agent, tick, childStatus)
     _G.BEHAVIAC_ASSERT(self:isReferencedBehavior(), "[_M:update()] self:isReferencedBehavior")
-    local status = self.m_subTreeTick:exec(self, agent)
+    local subTreeTick = self:getSubTreeTick(tick)
+    local status = subTreeTick:exec(subTreeTick:getBt(), agent)
     local bTransitioned, nextStateId = State.s_updateTransitions(self, agent, tick, self.m_transitions, self.m_nextStateId, status)
     self.m_nextStateId = nextStateId
 
     if bTransitioned then
         if status == EBTStatus.BT_RUNNING then
             -- subtree not exited, but it will transition to other states
-            self.m_subTreeTick:abort(agent)
+            subTreeTick:abort(agent)
         end
 
         status = EBTStatus.BT_SUCCESS

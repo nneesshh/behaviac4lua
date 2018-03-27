@@ -86,4 +86,43 @@ _M.constPropertyValueType = {
     static  = 2,    -- static
 }
 
+_M.constBsonElementType = {
+    BT_None = 0,
+    BT_Double = 1,
+    BT_String = 2,
+    BT_Object = 3,
+    BT_Array = 4,
+    BT_Binary = 5,
+    BT_Undefined = 6,
+    BT_ObjectId = 7,
+    BT_Boolean = 8,
+    BT_DateTime = 9,
+    BT_NULL = 10,
+    BT_Regex = 11,
+    BT_Reference = 12,
+    BT_Code = 13,
+    BT_Symbol = 14,
+    BT_ScopedCode = 15,
+    BT_Int32 = 16,
+    BT_Timestamp = 17,
+    BT_Int64 = 18,
+    BT_Float = 19,
+    BT_Element = 20,
+    BT_Set = 21,
+    BT_BehaviorElement = 22,
+    BT_PropertiesElement = 23,
+    BT_ParsElement = 24,
+    BT_ParElement = 25,
+    BT_NodeElement = 26,
+    BT_AttachmentsElement = 27,
+    BT_AttachmentElement = 28,
+    BT_AgentsElement = 29,
+    BT_AgentElement = 30,
+    BT_PropertyElement = 31,
+    BT_MethodsElement = 32,
+    BT_MethodElement = 33,
+    BT_Custom = 34,
+    BT_ParameterElement = 35
+}
+
 return _M

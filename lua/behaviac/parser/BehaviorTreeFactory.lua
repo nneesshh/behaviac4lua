@@ -23,13 +23,17 @@ function _M.preloadBehaviorTree(path)
         local BehaviorTree = NodeFactory.BehaviorTree
         bt = BehaviorTree.new()
 
-        local treeData = lib_loader.load(path)
+        local treeData, fileType = lib_loader.load(path)
         if not treeData then
             Logging.error("[_M:preloadBehaviorTree()] load file(%s) failed!!!", path)
             return
         end
 
-        bt:load(treeData, path)
+        if lib_loader.FILE_TYPE_BSON_BYTES == fileType then 
+            bt:loadBson(treeData, path)
+        elseif lib_loader.FILE_TYPE_JSON == fileType or lib_loader.FILE_TYPE_LUA == fileType then
+            bt:load(treeData, path)
+        end
         _M.btCache[path] = bt
     end
     return bt

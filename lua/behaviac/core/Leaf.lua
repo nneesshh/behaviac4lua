@@ -1,5 +1,5 @@
 --- Behaviac lib Component: leaf node.
--- @module LeafNode.lua
+-- @module Leaf.lua
 -- @author n.lee
 -- @copyright 2016
 -- @license MIT/X11
@@ -26,10 +26,10 @@ local StringUtils               = common.StringUtils
 
 -- Class
 local BaseNode = require(cwd .. "BaseNode")
-local LeafNode = class("LeafNode", BaseNode)
-_G.ADD_BEHAVIAC_DYNAMIC_TYPE("LeafNode", LeafNode)
-_G.BEHAVIAC_DECLARE_DYNAMIC_TYPE("LeafNode", "BaseNode")
-local _M = LeafNode
+local Leaf = class("Leaf", BaseNode)
+_G.ADD_BEHAVIAC_DYNAMIC_TYPE("Leaf", Leaf)
+_G.BEHAVIAC_DECLARE_DYNAMIC_TYPE("Leaf", "BaseNode")
+local _M = Leaf
 
 -------------------------------------------------------------------------------
 -- Initialize
@@ -46,6 +46,14 @@ end
 
 function _M:isLeaf()
     return true
+end
+
+--------------------------------------------------------------------------------
+-- Blackboard:
+--------------------------------------------------------------------------------
+
+function _M:traverse(childFirst, handler, agent, userData)
+    handler(self, agent, userData)
 end
 
 return _M

@@ -136,6 +136,10 @@ function _M:onExit(agent, tick, status)
     return true
 end
 
+function _M:traverse(childFirst, handler, agent, userData)
+    handler(self, agent, userData)
+end
+
 function _M:update(agent, tick, childStatus)
     _G.BEHAVIAC_ASSERT(self:isEvent(), "[_M:update()] self:isEvent()")
 

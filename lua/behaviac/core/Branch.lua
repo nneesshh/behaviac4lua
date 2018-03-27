@@ -148,7 +148,7 @@ function _M:execCurrentVisitingNode(curVisitingNode, agent, tick, childStatus)
             if parentBranch == self then
                 status = parentBranch:update(agent, tick, status)
             else
-                status = parentBranch:execWithChildStatus(agent, tick, status)
+                status = tick:execWithChildStatus(parentBranch, agent, status)
             end
 
             if status == EBTStatus.BT_RUNNING then
@@ -191,7 +191,7 @@ function _M:resumeBranch(agent, tick, status)
 
     -- clear it as it ends and the next exec might need to set it
     self:setCurrentVisitingNode(tick, false)
-    return parent:execWithChildStatus(agent, status)
+    return tick:execWithChildStatus(parent, agent, status)
 end
 
 -- See behaviortree_task.cpp

@@ -271,6 +271,14 @@ function _M:init(tick)
     self:setHasManagingParent(tick, false)
 end
 
+function _M:onReset(agent, tick)
+    
+end
+
+function _M:onEnter(agent, tick)
+    return true
+end
+
 -- return false if the event handling  needs to be stopped
 -- return true, the event hanlding will be checked furtherly
 function _M:onEvent(agent, tick, eventName, eventParams)

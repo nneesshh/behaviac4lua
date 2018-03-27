@@ -26,10 +26,10 @@ local StringUtils               = common.StringUtils
 
 -- Class
 -- The behavior tree return success or failure.
-local BaseNode = require(ppdir .. "core.BaseNode")
-local Cls_End = class("End", BaseNode)
+local Leaf = require(ppdir .. "core.Leaf")
+local Cls_End = class("End", Leaf)
 _G.ADD_BEHAVIAC_DYNAMIC_TYPE("End", Cls_End)
-_G.BEHAVIAC_DECLARE_DYNAMIC_TYPE("End", "BaseNode")
+_G.BEHAVIAC_DECLARE_DYNAMIC_TYPE("End", "Leaf")
 local _M = Cls_End
 
 local NodeParser = require(ppdir .. "parser.NodeParser")

@@ -26,10 +26,10 @@ local StringUtils               = common.StringUtils
 
 -- Class
 -- Wait for the specified milliseconds, and always return Running until time over.
-local BaseNode = require(ppdir .. "core.BaseNode")
-local Wait = class("Wait", BaseNode)
+local Leaf = require(ppdir .. "core.Leaf")
+local Wait = class("Wait", Leaf)
 _G.ADD_BEHAVIAC_DYNAMIC_TYPE("Wait", Wait)
-_G.BEHAVIAC_DECLARE_DYNAMIC_TYPE("Wait", "BaseNode")
+_G.BEHAVIAC_DECLARE_DYNAMIC_TYPE("Wait", "Leaf")
 local _M = Wait
 
 local NodeParser = require(ppdir .. "parser.NodeParser")

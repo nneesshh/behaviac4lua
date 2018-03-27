@@ -74,7 +74,7 @@ local function unpackParams(agent, params)
     -- agent is unused
     local retValues = {}
     for _, paramProp in ipairs(params) do
-        table.insert(retValues, paramProp.value(agent))
+        table.insert(retValues, paramProp:getValue(agent))
     end
     return unpack(retValues)
 end
@@ -200,8 +200,8 @@ function _M:compare(agent, opr, operatorType)
     end
 end
 
-function _M:setTaskParams(agent, treeTask)
-    print("_M:setTaskParams(agent, treeTask)")
+function _M:setTaskParams(agent, treeTick)
+    print("_M:setTaskParams(agent, treeTick)")
 end
 
 local function parseForParams(paramStr)
@@ -281,89 +281,100 @@ function _M:buildProperty(propertyStr)
     self.isMethod = false
 
     local tokens = StringUtils.splitTokens(propertyStr)
-    if tokens[1] == "const" then
-        -- const type bulabula
-        _G.BEHAVIAC_ASSERT(#tokens == 3, "_M.parseProperty #tokens == 3")
-
-        local typeName = tokens[2]
-        local valueStr = tokens[3]
-        local isArray = false
-        local isStruct = false
-
+    if #tokens <= 1 then
+        -- return propertyStr directly because we don't pase
+        -- meta file, and we don't know the real type
         self.type  = constPropertyValueType.const
-        self.value, isArray, isStruct = ConstValueReader.readAnyType(typeName, valueStr) 
+        self.value = propertyStr
         self.valueIsFunction = false
-        self.realTypeIsArray = isArray
-        self.realTypeIsStruct = isStruct
-        self.realTypeName = typeName
-    else
-        local propStr       = ""
-        local typeName      = ""
-        local indexPropStr  = ""
-        if tokens[1] == "static" then
-            -- static number/table/str Self.m_s_float_type_0
-            -- static number/table/str _G.xxx.yyy
-            _G.BEHAVIAC_ASSERT(#tokens == 3 or #tokens == 4, "_M.parseProperty static #tokens ~= 3, 4")
-            typeName = tokens[2]
-            propStr  = tokens[3]
-            self.type  = constPropertyValueType.static
-
-            -- array index
-            if #tokens >= 4 then
-                indexPropStr = tokens[4]
-            end
-        else
-            -- number/table/str Self.m_s_float_type_0
-            -- number/table/str _G.xxx.yyy
-            _G.BEHAVIAC_ASSERT(#tokens == 2 or #tokens == 3, "_M.parseProperty non-static #tokens ~= 2, 3")
-            typeName   = tokens[1]
-            propStr    = tokens[2]
-            self.type  = constPropertyValueType.default
-
-            -- array index
-            if #tokens >= 3 then
-                indexPropStr = tokens[3]
-            end
-        end
-        
-        local indexMember = 0
-
-        --//if (!StringUtils::IsNullOrEmpty(indexPropStr))
-        if #indexPropStr > 0 then
-            indexMember = tonumber(indexPropStr)
-        end
-        
-        local intanceName, className, propertyName = string.gmatch(propStr, "(.+)%.(.+)::(.+)")()
-        if string.lower(intanceName) == "self" then
-            _G.BEHAVIAC_ASSERT(propertyName, "_M.parseProperty() property name can't be nil")
-            self.value = function(agent)
-                local val = agent[propertyName]
-                if val then
-                    return val
-                else
-                    return agent:getLocalVariable(propertyName)
-                end
-            end
-            self.setValue = function(agent, value)
-                agent[propertyName] = value
-            end
-        else
-            self.value = function(agent)
-                local other = AgentMeta.getInstance(intanceName, className)
-                return other and other[propertyName]
-            end
-            self.setValue = function(agent, value)
-                local other = AgentMeta.getInstance(intanceName, className)
-                if nil ~= other then
-                    other[propertyName] = value
-                end
-            end
-        end
-
-        self.valueIsFunction = true
         self.realTypeIsArray = false
         self.realTypeIsStruct = false
-        self.realTypeName = typeName
+        self.realTypeName = "string"
+    else
+        if tokens[1] == "const" then
+            -- const type bulabula
+            _G.BEHAVIAC_ASSERT(#tokens == 3, "_M.parseProperty #tokens == 3")
+
+            local typeName = tokens[2]
+            local valueStr = tokens[3]
+            local isArray = false
+            local isStruct = false
+
+            self.type  = constPropertyValueType.const
+            self.value, isArray, isStruct = ConstValueReader.readAnyType(typeName, valueStr) 
+            self.valueIsFunction = false
+            self.realTypeIsArray = isArray
+            self.realTypeIsStruct = isStruct
+            self.realTypeName = typeName
+        else
+            local propStr       = ""
+            local typeName      = ""
+            local indexPropStr  = ""
+            if tokens[1] == "static" then
+                -- static number/table/str Self.m_s_float_type_0
+                -- static number/table/str _G.xxx.yyy
+                _G.BEHAVIAC_ASSERT(#tokens == 3 or #tokens == 4, "_M.parseProperty static #tokens ~= 3, 4")
+                typeName = tokens[2]
+                propStr  = tokens[3]
+                self.type  = constPropertyValueType.static
+
+                -- array index
+                if #tokens >= 4 then
+                    indexPropStr = tokens[4]
+                end
+            else
+                -- number/table/str Self.m_s_float_type_0
+                -- number/table/str _G.xxx.yyy
+                _G.BEHAVIAC_ASSERT(#tokens == 2 or #tokens == 3, "_M.parseProperty non-static #tokens ~= 2, 3")
+                typeName   = tokens[1]
+                propStr    = tokens[2]
+                self.type  = constPropertyValueType.default
+
+                -- array index
+                if #tokens >= 3 then
+                    indexPropStr = tokens[3]
+                end
+            end
+            
+            local indexMember = 0
+
+            --//if (!StringUtils::IsNullOrEmpty(indexPropStr))
+            if #indexPropStr > 0 then
+                indexMember = tonumber(indexPropStr)
+            end
+            
+            local intanceName, className, propertyName = string.gmatch(propStr, "(.+)%.(.+)::(.+)")()
+            if string.lower(intanceName) == "self" then
+                _G.BEHAVIAC_ASSERT(propertyName, "_M.parseProperty() property name can't be nil")
+                self.value = function(agent)
+                    local val = agent[propertyName]
+                    if val then
+                        return val
+                    else
+                        return agent:getLocalVariable(propertyName)
+                    end
+                end
+                self.setValue = function(agent, value)
+                    agent[propertyName] = value
+                end
+            else
+                self.value = function(agent)
+                    local other = AgentMeta.getInstance(intanceName, className)
+                    return other and other[propertyName]
+                end
+                self.setValue = function(agent, value)
+                    local other = AgentMeta.getInstance(intanceName, className)
+                    if nil ~= other then
+                        other[propertyName] = value
+                    end
+                end
+            end
+
+            self.valueIsFunction = true
+            self.realTypeIsArray = false
+            self.realTypeIsStruct = false
+            self.realTypeName = typeName
+        end
     end
 
 end

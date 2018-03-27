@@ -26,10 +26,10 @@ local StringUtils               = common.StringUtils
 
 -- Class
 -- Do nothing except return success.
-local BaseNode = require(ppdir .. "core.BaseNode")
-local Noop = class("Noop", BaseNode)
+local Leaf = require(ppdir .. "core.Leaf")
+local Noop = class("Noop", Leaf)
 _G.ADD_BEHAVIAC_DYNAMIC_TYPE("Noop", Noop)
-_G.BEHAVIAC_DECLARE_DYNAMIC_TYPE("Noop", "BaseNode")
+_G.BEHAVIAC_DECLARE_DYNAMIC_TYPE("Noop", "Leaf")
 local _M = Noop
 
 local NodeParser = require(ppdir .. "parser.NodeParser")

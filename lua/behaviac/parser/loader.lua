@@ -1,68 +1,91 @@
---- Behaviac lib Component: lib_loader.
+--- Behaviac lib Component: lib loader.
 -- @module loader.lua
 -- @author n.lee
 -- @copyright 2016
 -- @license MIT/X11
 
-local _M = {}
+local _M = {
+	FILE_TYPE_UNKNOWN = 0,
+	FILE_TYPE_BSON_BYTES = 1,
+	FILE_TYPE_JSON = 2,
+	FILE_TYPE_LUA = 3
+}
 
---------------------------------------------------------------------------------
 -- Localize
---------------------------------------------------------------------------------
 local pdir = (...):gsub('%.[^%.]+%.loader$', '') .. "."
 local cwd   = (...):gsub('%.loader$', '') .. "."
+local lib_bson = require(pdir .. "external.bson")
 local lib_json = require(pdir .. "external.json")
 
-local function load_from_file(filepath)
-	local contents
-	local file, err = io.open(filepath, "r")
-	if err then
-		print("[load_from_file()] open file(" .. filepath .. ") error -- " .. err)
-	elseif file then
-		contents = file:read("*a")
-		io.close(file)
-		file = nil
-	end
-	return contents
+local function open_binary(filepath)
+	return io.open(filepath, "rb")
 end
 
---------------------------------------------------------------------------------
--- Load Map Data
---------------------------------------------------------------------------------
-function _M.load(path)
-	local extension = path:match("%.[^%./]-$") or "[no extension]"
-	if extension ~= ".json" and extension ~= ".lua" then
-		error("Unsupported file extension " .. extension .. ".")
+local function load_from_file(filepath)
+	local f, err = io.open(filepath, "r")
+	if f then
+		local contents = f:read("*a")
+		io.close(f)
+		f = nil
+		return contents
 	end
+end
 
-	------------------------------------------------------------------------------
-	-- Load JSON
-	------------------------------------------------------------------------------
-	if extension == ".json" then
-		local contents = load_from_file(path)
+local function load_bson_bytes(path)
+	local f, err = open_binary(path)
+	if f then
+		local doc = lib_bson.readDocument(f)
+		io.close(f)
+		return doc
+	end
+end
+
+local function load_json(path)
+	local contents = load_from_file(path)
+	if contents then
 		local data, _, msg = lib_json:decode(contents) -- Ignore the second value - it's the character the issue was found on
-
-		if not data then
-			error("Failed to parse JSON data '" .. path .. "'")
-		end
-
 		return data
+	end
+end
 
-	------------------------------------------------------------------------------
-	-- Load Lua
-	------------------------------------------------------------------------------
-	elseif extension == ".lua" then
-		local luaName = path:match("^[%.]?[/]?(.+)%.[^%./]-$"):gsub("/", ".")
-		local success, result = pcall(require, luaName)
+local function load_lua(path)
+	local luaName = path:match("^[%.]?[/]?(.+)%.[^%./]-$"):gsub("/", ".")
+	local success, data = pcall(require, luaName)
+	if success then
+		return data
+	end
+end
 
-		if not success then
-			error("Failed to load Lua data from map '" .. filename .. "'")
+local constFileType = {
+	{ ".bson.bytes", _M.FILE_TYPE_BSON_BYTES, load_bson_bytes },
+	{ ".json", _M.FILE_TYPE_JSON, load_json },
+	{ ".lua", _M.FILE_TYPE_LUA, load_lua },
+}
+
+function _M.getBehaviorTreeBaseName(treeName)
+	for _, v in ipairs(constFileType) do
+		local posStart, _ = string.find(treeName, v[1].."$")
+		if posStart then
+			return string.sub(treeName, 1, posStart-1)
 		end
+	end
+	return treeName
+end
 
-		return result
-	end -- No need to check for other extensions because we already safeguarded with a check earlier
+local function loadIter(t, index)
 
-	return data
+end
+
+-- Load 
+function _M.load(path)
+	local result = false
+	for _, v in ipairs(constFileType) do
+		result = v[3](path .. v[1])
+		if result then
+			return result, v[2]
+		end
+	end
+	return nil, _M.FILE_TYPE_UNKNOWN
 end
 
 return _M

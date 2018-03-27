@@ -67,6 +67,18 @@ function MyRobotClass:doTask(taskId)
     end
 end
 
+function MyRobotClass:doUnlockMapArea(taskId)
+    self.count = self.count + 1
+    if self.count >= 2 then
+        print("doTask...success")
+        self.count = 0
+        return EBTStatus.BT_SUCCESS
+    else
+        print("doTask...running")
+        return EBTStatus.BT_RUNNING
+    end
+end
+
 function MyRobotClass:doLogPlayerInfo(param1, param2)
     print("doLogPlayerInfo...")
     return EBTStatus.BT_SUCCESS
@@ -86,17 +98,20 @@ local path = AgentMeta.getBehaviorTreePath("LoopBT")
 --local path = AgentMeta.getBehaviorTreePath("SequenceBT")
 --local path = AgentMeta.getBehaviorTreePath("InstanceBT")
 --local path = AgentMeta.getBehaviorTreePath("ParentBT")
-local path_main = AgentMeta.getBehaviorTreePath("maintree")
-local path_sub = AgentMeta.getBehaviorTreePath("subtree")
-local path_maintree_task = AgentMeta.getBehaviorTreePath("maintree_task")
+local path_maintree = AgentMeta.getBehaviorTreePath("maintree.bson.bytes")
+local path_subtree = AgentMeta.getBehaviorTreePath("subtree")
+local path_maintree_task = AgentMeta.getBehaviorTreePath("maintree_task.bson.bytes")
 local path_subtree_task = AgentMeta.getBehaviorTreePath("subtree_task")
 local path_LoopBattleBT = AgentMeta.getBehaviorTreePath("LoopBattleBT")
 local path_demo = AgentMeta.getBehaviorTreePath("demo")
 local path_StructBT = AgentMeta.getBehaviorTreePath("StructBT")
-local path_EnumBT = AgentMeta.getBehaviorTreePath("EnumBT")
+local path_EnumBT = AgentMeta.getBehaviorTreePath("EnumBT.bson.bytes")
+
+local path_islandBattle = AgentMeta.getBehaviorTreePath("islandBattle")
 
 AgentMeta.registerEnumType("FirstEnum", { e1 = 0, e2 = 1 })
-myRobot:btSetCurrent(path_LoopBattleBT)
+myRobot:btSetCurrent(path_islandBattle)
+--myRobot:btSetCurrent(path_maintree)
 
 local loopCount = 3
 for i= 1, loopCount do

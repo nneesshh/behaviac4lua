@@ -25,10 +25,10 @@ local Logging                   = common.d_log
 local StringUtils               = common.StringUtils
 
 -- Class
-local BaseNode = require(cwd .. "BaseNode")
-local Condition = class("Condition", BaseNode)
+local Leaf = require(cwd .. "Leaf")
+local Condition = class("Condition", Leaf)
 _G.ADD_BEHAVIAC_DYNAMIC_TYPE("Condition", Condition)
-_G.BEHAVIAC_DECLARE_DYNAMIC_TYPE("Condition", "BaseNode")
+_G.BEHAVIAC_DECLARE_DYNAMIC_TYPE("Condition", "Leaf")
 local _M = Condition
 
 local NodeParser = require(pdir .. "parser.NodeParser")

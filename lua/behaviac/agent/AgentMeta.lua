@@ -15,6 +15,7 @@ local _M = {
 -- Localize
 local pdir = (...):gsub('%.[^%.]+%.[^%.]+$', '') .. "."
 local cwd = (...):gsub('%.[^%.]+$', '') .. "."
+local lib_loader = require(pdir .. "parser.loader")
 
 function _M.registerMeta(metaClassName, meta)
     _M._agentMetas[metaClassName] = meta
@@ -65,12 +66,8 @@ function _M.setBehaviorTreeFolder(folderName)
 end
 
 function _M.getBehaviorTreePath(treeName)
-    local ext = ".json"
-    if string.sub(treeName, -5) ~= ext then
-        return _M._behaviorTreeFolder .. treeName .. ext
-    else
-        return _M._behaviorTreeFolder .. treeName
-    end
+    local baseName = lib_loader.getBehaviorTreeBaseName(treeName)
+    return _M._behaviorTreeFolder .. baseName
 end
 
 return _M
