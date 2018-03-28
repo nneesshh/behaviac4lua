@@ -17,11 +17,11 @@ local cwd   = (...):gsub('%.loader$', '') .. "."
 local lib_bson = require(pdir .. "external.bson")
 local lib_json = require(pdir .. "external.json")
 
-local function open_binary(filepath)
+local function _open_binary(filepath)
 	return io.open(filepath, "rb")
 end
 
-local function load_from_file(filepath)
+local function _load_from_file(filepath)
 	local f, err = io.open(filepath, "r")
 	if f then
 		local contents = f:read("*a")
@@ -31,8 +31,8 @@ local function load_from_file(filepath)
 	end
 end
 
-local function load_bson_bytes(path)
-	local f, err = open_binary(path)
+local function _load_bson_bytes(path)
+	local f, err = _open_binary(path)
 	if f then
 		local doc = lib_bson.readDocument(f)
 		io.close(f)
@@ -40,15 +40,15 @@ local function load_bson_bytes(path)
 	end
 end
 
-local function load_json(path)
-	local contents = load_from_file(path)
+local function _load_json(path)
+	local contents = _load_from_file(path)
 	if contents then
 		local data, _, msg = lib_json:decode(contents) -- Ignore the second value - it's the character the issue was found on
 		return data
 	end
 end
 
-local function load_lua(path)
+local function _load_lua(path)
 	local luaName = path:match("^[%.]?[/]?(.+)%.[^%./]-$"):gsub("/", ".")
 	local success, data = pcall(require, luaName)
 	if success then
@@ -57,9 +57,9 @@ local function load_lua(path)
 end
 
 local constFileType = {
-	{ ".bson.bytes", _M.FILE_TYPE_BSON_BYTES, load_bson_bytes },
-	{ ".json", _M.FILE_TYPE_JSON, load_json },
-	{ ".lua", _M.FILE_TYPE_LUA, load_lua },
+	{ ".bson.bytes", _M.FILE_TYPE_BSON_BYTES, _load_bson_bytes },
+	{ ".json", _M.FILE_TYPE_JSON, _load_json },
+	{ ".lua", _M.FILE_TYPE_LUA, _load_lua },
 }
 
 function _M.testFileType(path)
@@ -77,7 +77,7 @@ function _M.testFileType(path)
 	return false, _M.FILE_TYPE_UNKNOWN
 end
 
-local function try_load_by_auto_match_file_type(pathBase)
+local function _try_load_by_auto_match_file_type(pathBase)
 	local data = nil
 	local extensionName, fileType, loadFunc
 	for _, v in ipairs(constFileType) do
@@ -94,7 +94,7 @@ end
 
 -- Load 
 function _M.load(pathBase)
-	return try_load_by_auto_match_file_type(pathBase)
+	return _try_load_by_auto_match_file_type(pathBase)
 end
 
 return _M

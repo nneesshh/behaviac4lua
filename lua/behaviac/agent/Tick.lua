@@ -192,7 +192,7 @@ function _M:onExitAction(targetNode, agent, status)
     targetNode:applyEffects(agent, self, phase)
 end
 
-local function getRunningNodesHandler(node, agent, tick, retNodes)
+local function _getRunningNodesHandler(node, agent, tick, retNodes)
     local status = node:getStatus(tick)
     if status == EBTStatus.BT_RUNNING then
         table.insert(retNodes, node)
@@ -207,7 +207,7 @@ function _M:getRunningNodes(targetNode, onlyLeaves)
     end
 
     local nodes = {}
-    targetNode:traverse(true, getRunningNodesHandler, nil, self, nodes)
+    targetNode:traverse(true, _getRunningNodesHandler, nil, self, nodes)
     if onlyLeaves and #nodes > 0 then
         local leaves = {}
         for _, one in ipairs(nodes) do
@@ -221,7 +221,7 @@ function _M:getRunningNodes(targetNode, onlyLeaves)
     return nodes
 end
 
-local function abortHandler(node, agent, tick, userData)
+local function _abortHandler(node, agent, tick, userData)
     --_G.BEHAVIAC_UNUSED_VAR(userData)
     local status = node:getStatus(tick)
     if status == EBTStatus.BT_RUNNING then
@@ -234,10 +234,10 @@ local function abortHandler(node, agent, tick, userData)
 end
 
 function _M:abort(targetNode, agent)
-    targetNode:traverse(true, abortHandler, agent, self, nil)
+    targetNode:traverse(true, _abortHandler, agent, self, nil)
 end
 
-local function resetHandler(node, agent, tick, userData)
+local function _resetHandler(node, agent, tick, userData)
     --_G.BEHAVIAC_UNUSED_VAR(userData)
     node:setStatus(tick, EBTStatus.BT_INVALID)
     node:setCurrentVisitingNode(tick, false)
@@ -246,10 +246,10 @@ local function resetHandler(node, agent, tick, userData)
 end
 
 function _M:reset(targetNode, agent)
-    targetNode:traverse(true, resetHandler, agent, self, nil)
+    targetNode:traverse(true, _resetHandler, agent, self, nil)
 end
 
-local function endHandler(node, agent, tick, userData)
+local function _endHandler(node, agent, tick, userData)
     local status = node:getStatus(tick)
     if status == EBTStatus.BT_RUNNING or status == EBTStatus.BT_INVALID  then
         tick:onExitAction(node, agent, userData)
@@ -261,7 +261,7 @@ local function endHandler(node, agent, tick, userData)
 end
 
 function _M:endDo(targetNode, agent, status)
-    targetNode:traverse(true, endHandler, agent, self, status)
+    targetNode:traverse(true, _endHandler, agent, self, status)
 end
 
 function _M:getBt()

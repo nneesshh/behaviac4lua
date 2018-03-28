@@ -89,7 +89,7 @@ local CRC32 = {
     3094707162,3040238851,2985771188,
 }
 
-local function xor(a, b)
+local function _xor(a, b)
     local calc = 0    
 
     for i = 32, 0, -1 do
@@ -125,12 +125,12 @@ local function xor(a, b)
     return calc
 end
 
-local function lshift(num, left)
+local function _lshift(num, left)
     local res = num * (2 ^ left)
     return res % (2 ^ 32)
 end
 
-local function rshift(num, right)
+local function _rshift(num, right)
     local res = num / (2 ^ right)
     return math.floor(res)
 end
@@ -143,7 +143,7 @@ function CRC32_module.Hash(str)
     for i=1,count do
 		local byte = string.byte(str, i)
 
-		crc = xor(lshift(crc, 8), CRC32[xor(rshift(crc, 24), byte) + 1])
+		crc = _xor(_lshift(crc, 8), CRC32[_xor(_rshift(crc, 24), byte) + 1])
     end
 
     return crc

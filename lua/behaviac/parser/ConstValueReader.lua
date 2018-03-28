@@ -61,7 +61,7 @@ local basic_type_value_read_func_ = {
     ["behaviac::EBTStatus"]     = function(str) return EBTStatus[str] end,
 }
 
-local function testIsStruct(valueStr)
+local function _testIsStruct(valueStr)
     return string.byte(valueStr, 1) == constCharByte.LeftBraces
 end
 
@@ -84,7 +84,7 @@ function _M.readAnyType(typeName, valueStr)
         return f(valueStr), isArray, isStruct
     else
         -- it must be struct or enum
-        isStruct = testIsStruct(valueStr)
+        isStruct = _testIsStruct(valueStr)
         if isStruct then
             return _M.readStruct(typeName, valueStr), isArray, isStruct
         else
@@ -102,7 +102,7 @@ function _M.readStruct(typeName, valueStr)
         local val = expression[2]
         local strLen = string.len(val)
         if strLen > 0 then
-            if testIsStruct(val) then
+            if _testIsStruct(val) then
                 retStruct[key] = _M.readStruct(typeName, val)
             else
                 -- test is struct array

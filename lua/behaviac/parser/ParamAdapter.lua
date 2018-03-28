@@ -49,7 +49,7 @@ function _M:ctor()
     self.paramProperties = {}
 end
 
-local function unpackParams(agent, paramProperties)
+local function _unpackParams(agent, paramProperties)
     local retValues = {}
     for _, paramProp in ipairs(paramProperties) do
         table.insert(retValues, paramProp:getValue(agent))
@@ -59,7 +59,7 @@ end
 
 function _M:run(agent)
     if self.isMethod and self.valueIsFunction then
-        self.value(agent, unpackParams(agent, self.paramProperties))
+        self.value(agent, _unpackParams(agent, self.paramProperties))
     end
 end
 
@@ -74,7 +74,7 @@ function _M:getValue(agent)
         return self.value
     end
     if self.paramProperties then
-        return self.value(agent, unpackParams(agent, self.paramProperties))
+        return self.value(agent, _unpackParams(agent, self.paramProperties))
     else
         return self.value(agent)
     end
@@ -86,7 +86,7 @@ function _M:getValueFrom(agent, method)
         return self.value
     end
     if self.paramProperties then
-        return self.value(agent, fp, unpackParams(agent, self.paramProperties))
+        return self.value(agent, fp, _unpackParams(agent, self.paramProperties))
     else
         return self.value(agent, fp)
     end
@@ -329,7 +329,7 @@ end
 -- Static
 --------------------------------------------------------------------------------
 
-local function parseForParams(paramStr)
+local function _parseForParams(paramStr)
     local params = {}
     
     local startIndex = 1
@@ -357,7 +357,7 @@ end
 
 function _M.s_createParamProperties(paramStr)
     local retProperties = {}
-    local params = parseForParams(paramStr)
+    local params = _parseForParams(paramStr)
     if #params > 0 then
         for _, propStr in ipairs(params) do
             local prop = _M.new()

@@ -33,13 +33,13 @@ _M.makeReadOnly = function(t)
 end  
 
 --[[
-local function testReadOnly()
+local function _testReadOnly()
     local days = readOnly{"Sunday","Monday","Tuesday","Wednessday","Thursday","Friday","Saturday"}   
     print(days[1])
     table.insert(days, "xxxxxxxxxxxxxxxx") --error in lua5.3, but not in lua5.1
     days[2] = "hello" --error
 end
-testReadOnly()
+_testReadOnly()
 ]]
 
 return _M

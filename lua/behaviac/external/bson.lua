@@ -45,7 +45,7 @@ local bson = {}
 
 -- Helper functions
 
-local function toLSB(bytes,value)
+local function _toLSB(bytes,value)
   local str = ""
   for j=1,bytes do
      str = str .. string.char(value % 256)
@@ -54,30 +54,30 @@ local function toLSB(bytes,value)
   return str
 end
 
-local function toLSB16(value) return toLSB(2,value) end
-local function toLSB32(value) return toLSB(4,value) end
-local function toLSB64(value) return toLSB(8,value) end
+local function _toLSB16(value) return _toLSB(2,value) end
+local function _toLSB32(value) return _toLSB(4,value) end
+local function _toLSB64(value) return _toLSB(8,value) end
 
-local function fromLSB8(s,p)
+local function _fromLSB8(s,p)
   return s:byte(p), p+1
 end
 
-local function fromLSB16(s,p)
+local function _fromLSB16(s,p)
   return s:byte(p) + (s:byte(p+1)*256), p+2
 end
 
-local function fromLSB32(s,p)
+local function _fromLSB32(s,p)
   return s:byte(p) + (s:byte(p+1)*256) + 
   (s:byte(p+2)*65536) + (s:byte(p+3)*16777216), p+4
 end
 
-local function fromLSB64(s,p)
-  return fromLSB32(s,p) +
+local function _fromLSB64(s,p)
+  return _fromLSB32(s,p) +
   (s:byte(p+4)*4294967296) + (s:byte(p+5)*1099511627776) +
   (s:byte(p+6)*2.8147497671066e+14) + (s:byte(p+7)*7.2057594037928e+16), p+8
 end
 
-local function to_double(value)
+local function _to_double(value)
   local buffer = ''
   local float64 = {}
   local bias = 1023
@@ -158,16 +158,16 @@ function bson.to_bool(n,v)
   end
 end
 
-function bson.to_str(n,v) return "\002"..n.."\000"..toLSB32(#v+1)..v.."\000" end
-function bson.to_int32(n,v) return "\016"..n.."\000"..toLSB32(v) end
-function bson.to_int64(n,v) return "\018"..n.."\000"..toLSB64(v) end
-function bson.to_double(n,v) return "\001"..n.."\000"..to_double(v) end
+function bson.to_str(n,v) return "\002"..n.."\000".._toLSB32(#v+1)..v.."\000" end
+function bson.to_int32(n,v) return "\016"..n.."\000".._toLSB32(v) end
+function bson.to_int64(n,v) return "\018"..n.."\000".._toLSB64(v) end
+function bson._to_double(n,v) return "\001"..n.."\000".._to_double(v) end
 function bson.to_x(n,v) return v(n) end
 
 function bson.utc_datetime(t)
   local t = t or (os.time()*1000)
   f = function (n)
-     return "\009"..n.."\000"..toLSB64(t)
+     return "\009"..n.."\000".._toLSB64(t)
   end
   return f
 end
@@ -182,7 +182,7 @@ bson.B_USER_DEFINED = "\128"
 function bson.binary(v, subtype)
   local subtype = subtype or bson.B_GENERIC
   f = function (n) 
-     return "\005"..n.."\000"..toLSB32(#v)..subtype..v
+     return "\005"..n.."\000".._toLSB32(#v)..subtype..v
   end
   return f
 end
@@ -197,7 +197,7 @@ function bson.to_num(n,v)
   end
 
   if math.floor(v) ~= v then
-    return bson.to_double(n,v)
+    return bson._to_double(n,v)
   elseif v > 2147483647 or v < -2147483648 then
     return bson.to_int64(n,v)
   else
@@ -243,7 +243,7 @@ function bson.start() return "" end
 
 function bson.finish(doc) 
   doc = doc .. "\000"
-  return toLSB32(#doc+4)..doc
+  return _toLSB32(#doc+4)..doc
 end
 
 function bson.encode(doc)
@@ -264,15 +264,15 @@ function bson.from_bool(doc, startPos)
 end
 
 function bson.from_int16(doc, startPos)
-  return fromLSB16(doc, startPos)
+  return _fromLSB16(doc, startPos)
 end
 
 function bson.from_int32(doc, startPos)
-   return fromLSB32(doc, startPos)
+   return _fromLSB32(doc, startPos)
 end
 
 function bson.from_int64(doc, startPos)
-   return fromLSB64(doc, startPos)
+   return _fromLSB64(doc, startPos)
 end
 
 function bson.from_double(doc, startPos)
@@ -325,18 +325,18 @@ function bson.from_double(doc, startPos)
 end
 
 function bson.from_utc_date_time(doc, startPos)
-  return fromLSB64(doc, startPos)
+  return _fromLSB64(doc, startPos)
 end
 
 function bson.from_binary(doc, startPos)
-  local len, nextPos = fromLSB32(doc, startPos)
+  local len, nextPos = _fromLSB32(doc, startPos)
   local str = doc:sub(nextPos+1, nextPos+1+len-1)
   return str, nextPos+1+len
 end
 
 
 function bson.from_str(doc, startPos)
-  local len, nextPos = fromLSB32(doc, startPos)
+  local len, nextPos = _fromLSB32(doc, startPos)
   local str = doc:sub(nextPos, nextPos+len-2)
   return str, nextPos+len
 end
@@ -351,7 +351,7 @@ function bson.decode_doc_(len, doc, startPos, docType)
   local nextPos = startPos
   local val, ename, etype
   repeat
-    etype, nextPos = fromLSB8(doc, nextPos)
+    etype, nextPos = _fromLSB8(doc, nextPos)
     if etype == 0 then
       break
     elseif not bson_to_lua_tbl[etype] then
@@ -395,7 +395,7 @@ end
 function bson.decode_next_io(fd)
   local slen = fd:read(4)
   if not slen then return nil end
-  local len, _ = fromLSB32(slen, 1) - 4
+  local len, _ = _fromLSB32(slen, 1) - 4
   local doc = fd:read(len)
   return bson.decode(len, doc)
 end
@@ -413,13 +413,13 @@ end
 function bson.readDocument(fd)
   local slen = fd:read(4)
   if not slen then return nil end
-  local len, _ = fromLSB32(slen, 1) - 4
+  local len, _ = _fromLSB32(slen, 1) - 4
   local doc = fd:read(len)
   return doc, len
 end
 
 function bson.readByte(s,p)
-  return fromLSB8(s,p)
+  return _fromLSB8(s,p)
 end
 
 function bson.readBool(s,p)
@@ -427,15 +427,15 @@ function bson.readBool(s,p)
 end
 
 function bson.readInt16(s,p)
-  return fromLSB16(s,p)
+  return _fromLSB16(s,p)
 end
 
 function bson.readInt32(s,p)
-  return fromLSB32(s,p)
+  return _fromLSB32(s,p)
 end
 
 function bson.readString(s,p)
-  local len, nextPos = fromLSB16(s,p)
+  local len, nextPos = _fromLSB16(s,p)
   local str = s:sub(nextPos, nextPos+len-2)
   return str, nextPos+len
 end
