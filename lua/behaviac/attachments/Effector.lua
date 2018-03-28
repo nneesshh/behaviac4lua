@@ -25,10 +25,10 @@ local Logging                   = common.d_log
 local StringUtils               = common.StringUtils
 
 -- Class
-local BaseNode = require(pdir .. "core.BaseNode")
-local Effector = class("Effector", BaseNode)
+local AttachAction = require(cwd .. "AttachAction")
+local Effector = class("Effector", AttachAction)
 _G.ADD_BEHAVIAC_DYNAMIC_TYPE("Effector", Effector)
-_G.BEHAVIAC_DECLARE_DYNAMIC_TYPE("Effector", "BaseNode")
+_G.BEHAVIAC_DECLARE_DYNAMIC_TYPE("Effector", "AttachAction")
 local _M = Effector
 
 local EffectorConfig = require(cwd .. "EffectorConfig")
@@ -47,8 +47,6 @@ end
 
 function _M:release()
     _M.super.release(self)
-
-    self.m_ActionConfig = false
 end
 
 function _M:getPhase()

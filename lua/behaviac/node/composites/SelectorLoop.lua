@@ -55,11 +55,13 @@ end
 function _M:onLoading(version, agentType, properties)
     _M.super.onLoading(self, version, agentType, properties)
 
+    local nameStr, valueStr
     for _, p in ipairs(properties) do
-        local resetChildrenStr = p["ResetChildren"]
+        nameStr = p[1]
+        valueStr = p[2]
 
-        if nil ~= resetChildrenStr then
-            self.m_bResetChildren = (resetChildrenStr == "true")
+        if nameStr == "ResetChildren" then
+            self.m_bResetChildren = (valueStr == "true")
             break
         end
     end

@@ -47,7 +47,7 @@ function _M.loadProperties(selfNode, version, agentType, bsonTreeData, startPos)
         propertyName, nextPos = bson.readString(bsonTreeData, nextPos)
         propertyValue, nextPos = bson.readString(bsonTreeData, nextPos)
 
-        table.insert(properties, { [propertyName] = propertyValue })
+        table.insert(properties, { propertyName, propertyValue })
         etype, nextPos = bson.readByte(bsonTreeData, nextPos)
     end
 

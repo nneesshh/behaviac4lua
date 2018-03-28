@@ -54,16 +54,18 @@ end
 function _M:onLoading(version, agentType, properties)
     _M.super.onLoading(self, version, agentType, properties)
 
+    local nameStr, valueStr
     for _, p in ipairs(properties) do
-        local waitTimeStr = p["Time"]
+        nameStr = p[1]
+        valueStr = p[2]
 
-        if nil ~= waitTimeStr then
-            if stringUtils.isValidString(waitTimeStr) then
-                local pParenthesis = string.find(waitTimeStr, "%(")
+        if nameStr == "Time" then
+            if stringUtils.isValidString(valueStr) then
+                local pParenthesis = string.find(valueStr, "%(")
                 if not pParenthesis then
-                    self.m_time_p = NodeParser.parseProperty(waitTimeStr)
+                    self.m_time_p = NodeParser.parseProperty(valueStr)
                 else
-                    self.m_time_p = NodeParser.parseMethod(waitTimeStr)
+                    self.m_time_p = NodeParser.parseMethod(valueStr)
                 end
             end
         end

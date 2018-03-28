@@ -63,19 +63,20 @@ end
 function _M:onLoading(version, agentType, properties)
     _M.super.onLoading(self, version, agentType, properties)
 
+    local nameStr, valueStr
     for _, p in ipairs(properties) do
+        nameStr = p[1]
+        valueStr = p[2]
+
         -- Note: property name is "ReferenceBehavior", not "ReferencedBehavior"
         --       "ReferencedBehavior" is class name
-        local referencedBehaviorStr = p["ReferenceBehavior"]
-        local taskStr = p["Task"]
-
-        if nil ~= referencedBehaviorStr then
-            if StringUtils.isValidString(referencedBehaviorStr) then
-                local pParenthesis = string.find(referencedBehaviorStr, '%(')
+        if nameStr == "ReferenceBehavior" then
+            if StringUtils.isValidString(valueStr) then
+                local pParenthesis = string.find(valueStr, '%(')
                 if not pParenthesis then
-                    self.m_referencedBehavior = NodeParser.parseProperty(referencedBehaviorStr)
+                    self.m_referencedBehavior = NodeParser.parseProperty(valueStr)
                 else
-                    self.m_referencedBehavior = NodeParser.parseMethod(referencedBehaviorStr)
+                    self.m_referencedBehavior = NodeParser.parseMethod(valueStr)
                 end
 
                 self.m_referencedTreePath = self:getReferencedTree()
@@ -94,9 +95,9 @@ function _M:onLoading(version, agentType, properties)
                     self.m_bHasEvents = self.m_bHasEvents or bHasEvents
                 end
             end
-        elseif nil ~= taskStr then
-            _G.BEHAVIAC_ASSERT(not StringUtils.isNullOrEmpty(taskStr))
-            self.m_taskPrototype = NodeParser.parseTaskPrototype(taskStr)
+        elseif nameStr == "Task" then
+            _G.BEHAVIAC_ASSERT(not StringUtils.isNullOrEmpty(valueStr))
+            self.m_taskPrototype = NodeParser.parseTaskPrototype(valueStr)
         else
             -- _G.BEHAVIAC_ASSERT(0, "unrecognized property")
         end

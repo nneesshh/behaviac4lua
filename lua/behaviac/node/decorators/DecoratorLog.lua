@@ -52,11 +52,13 @@ end
 function _M:onLoading(version, agentType, properties)
     _M.super.onLoading(self, version, agentType, properties)
 
+    local nameStr, valueStr
     for _, p in ipairs(properties) do
-        local logStr = p["Log"]
+        nameStr = p[1]
+        valueStr = p[2]
 
-        if nil ~= logStr then
-            self.m_message = logStr
+        if nameStr == "Log" then
+            self.m_message = valueStr
         end
     end
 end

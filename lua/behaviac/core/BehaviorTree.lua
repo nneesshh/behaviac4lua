@@ -59,15 +59,16 @@ function _M:release()
 end
 
 function _M:onLoading(version, agentType, properties)
-    _M.super.onLoading(self.version, agentType, properties)
+    _M.super.onLoading(self, version, agentType, properties)
 
-    for _, p in pairs(properties) do
-        local domainsStr = p[constBaseKeyStrDef.kStrDomains]
-        local descriptorRefsStr = p[constBaseKeyStrDef.kStrDescriptorRefs]
+    local nameStr, valueStr
+    for _, p in ipairs(properties) do
+        nameStr = p[1]
+        valueStr = p[2]
 
-        if nil ~= domainsStr then
-            self.m_domains = domainsStr
-        elseif nil ~= descriptorRefsStr then
+        if nameStr == constBaseKeyStrDef.kStrDomains then
+            self.m_domains = valueStr
+        elseif nameStr == constBaseKeyStrDef.kStrDescriptorRefs then
             -- do nothing
         else
             -- do nothing

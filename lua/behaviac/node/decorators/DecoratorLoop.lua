@@ -54,11 +54,13 @@ end
 function _M:onLoading(version, agentType, properties)
     _M.super.onLoading(self, version, agentType, properties)
 
+    local nameStr, valueStr
     for _, p in ipairs(properties) do
-        local doneWithinFrameStr = p["DoneWithinFrame"]
+        nameStr = p[1]
+        valueStr = p[2]
 
-        if nil ~= doneWithinFrameStr then
-            self.m_bDoneWithinFrame = (doneWithinFrameStr == "true")
+        if nameStr == "DoneWithinFrame" then
+            self.m_bDoneWithinFrame = (valueStr == "true")
         end
     end   
 end

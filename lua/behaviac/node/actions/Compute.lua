@@ -61,30 +61,28 @@ end
 function _M:onLoading(version, agentType, properties)
     _M.super.onLoading(self, version, agentType, properties)
 
+    local nameStr, valueStr
     for _, p in ipairs(properties) do
-        local opLeftStr = p["Opl"]
-        local opStr = p["Operator"]
-        local opRightStr1 = p["Opr1"]
-        local opRightStr2 = p["Opr2"]
+        nameStr = p[1]
+        valueStr = p[2]
 
-        if nil ~= opLeftStr then
-            self.m_opl = NodeParser.parseProperty(opLeftStr)
-        elseif nil ~= opStr then
-            _G.BEHAVIAC_ASSERT((opStr == "Add" or opStr == "Sub" or opStr == "Mul" or opStr == "Div"), "[_M:onLoading()] operator must be add sub mul div")
-            self.m_operator = NodeParser.parseOperatorType(opStr)
-        elseif nil ~= opRightStr1 then
-            local pParenthesis = string.find(opRightStr1, '%(')
+        if nameStr == "Opl" then
+            self.m_opl = NodeParser.parseProperty(valueStr)
+        elseif nameStr == "Operator" then
+            self.m_operator = NodeParser.parseOperatorType(valueStr)
+        elseif nameStr == "Opr1" then
+            local pParenthesis = string.find(valueStr, '%(')
             if not pParenthesis then
-                self.m_opr1 = NodeParser.parseProperty(opRightStr1)
+                self.m_opr1 = NodeParser.parseProperty(valueStr)
             else
-                self.m_opr1 = NodeParser.parseMethod(opRightStr1)
+                self.m_opr1 = NodeParser.parseMethod(valueStr)
             end
-        elseif nil ~= opRightStr2 then
-            local pParenthesis = string.find(opRightStr2, '%(')
+        elseif nameStr == "Opr2" then
+            local pParenthesis = string.find(valueStr, '%(')
             if not pParenthesis then
-                self.m_opr2 = NodeParser.parseProperty(opRightStr2)
+                self.m_opr2 = NodeParser.parseProperty(valueStr)
             else
-                self.m_opr2 = NodeParser.parseMethod(opRightStr2)
+                self.m_opr2 = NodeParser.parseMethod(valueStr)
             end
         else
             -- do nothing

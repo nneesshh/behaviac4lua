@@ -42,18 +42,20 @@ function _M:ctor()
     self.m_phase = ENodePhase.E_SUCCESS
 end
 
-function _M:load(properties)
-    local loaded = _M.super.load(self, properties)
+function _M:parse(properties)
+    local success = _M.super.parse(self, properties)
 
+    local nameStr, valueStr
     for _, p in ipairs(properties) do
-        local phaseStr = p["Phase"]
+        nameStr = p[1]
+        valueStr = p[2]
 
-        if nil ~= phaseStr then
-            if phaseStr == "Success" then
+        if nameStr == "Phase" then
+            if valueStr == "Success" then
                 self.m_phase = ENodePhase.E_SUCCESS
-            elseif phaseStr == "Failure" then
+            elseif valueStr == "Failure" then
                 self.m_phase = ENodePhase.E_FAILURE
-            elseif phaseStr == "Both" then
+            elseif valueStr == "Both" then
                 self.m_phase = ENodePhase.E_BOTH
             else
                 _G.BEHAVIAC_ASSERT(false)
@@ -61,11 +63,7 @@ function _M:load(properties)
             break
         end
     end
-    return loaded
-end
-
-function _M:release()
-    _M.super.release(self)
+    return success
 end
 
 return _M

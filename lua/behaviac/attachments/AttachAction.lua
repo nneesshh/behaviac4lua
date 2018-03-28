@@ -42,7 +42,7 @@ local NodeParser = require(pdir .. "parser.NodeParser")
 function _M:ctor()
     _M.super.ctor(self)
 
-    self.m_ActionConfig = AttachActionConfig.new()
+    self.m_ActionConfig = false
 end
 
 function _M:release()
@@ -53,8 +53,8 @@ end
 
 function _M:onLoading(version, agentType, properties)
     _M.super.onLoading(self, version, agentType, properties)
-
-    self.m_ActionConfig:load(properties)
+    
+    self.m_ActionConfig:parse(properties)
 end
 
 --------------------------------------------------------------------------------

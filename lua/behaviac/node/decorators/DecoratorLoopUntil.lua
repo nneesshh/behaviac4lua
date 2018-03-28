@@ -55,11 +55,13 @@ end
 function _M:onLoading(version, agentType, properties)
     _M.super.onLoading(self, version, agentType, properties)
 
+    local nameStr, valueStr
     for _, p in ipairs(properties) do
-        local untilStr = p["Until"]
+        nameStr = p[1]
+        valueStr = p[2]
 
-        if nil ~= untilStr then
-            self.m_until = (untilStr == "true")
+        if nameStr == "Until" then
+            self.m_until = (valueStr == "true")
         end
     end
 end

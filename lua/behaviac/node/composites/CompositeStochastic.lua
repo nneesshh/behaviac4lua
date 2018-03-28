@@ -53,11 +53,13 @@ end
 function _M:onLoading(version, agentType, properties)
     _M.super.onLoading(self, version, agentType, properties)
 
+    local nameStr, valueStr
     for _, p in ipairs(properties) do
-        local randomGeneratorStr = p["RandomGenerator"]
-
-        if nil ~= randomGeneratorStr then
-            self.m_method = NodeParser.parseMethod(randomGeneratorStr)
+        nameStr = p[1]
+        valueStr = p[2]
+        
+        if nameStr == "RandomGenerator" then
+            self.m_method = NodeParser.parseMethod(valueStr)
         end
     end
 end

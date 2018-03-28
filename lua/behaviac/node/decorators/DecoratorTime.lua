@@ -55,15 +55,17 @@ end
 function _M:onLoading(version, agentType, properties)
     _M.super.onLoading(self, version, agentType, properties)
 
+    local nameStr, valueStr
     for _, p in ipairs(properties) do
-        local timeStr = p["Time"]
+        nameStr = p[1]
+        valueStr = p[2]
 
-        if nil ~= timeStr then
-            local pParenthesis = string.find(timeStr, "%(")
+        if nameStr == "Time" then
+            local pParenthesis = string.find(valueStr, "%(")
             if not pParenthesis then
-                self.m_time_p = BehaviorParseFactory.parseProperty(timeStr)
+                self.m_time_p = BehaviorParseFactory.parseProperty(valueStr)
             else
-                self.m_time_p = BehaviorParseFactory.parseMethod(timeStr)
+                self.m_time_p = BehaviorParseFactory.parseMethod(valueStr)
             end
         end
     end

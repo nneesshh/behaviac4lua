@@ -56,26 +56,26 @@ end
 function _M:onLoading(version, agentType, properties)
     _M.super.onLoading(self, version, agentType, properties)
 
+    local nameStr, valueStr
     for _, p in ipairs(properties) do
-        local opStr = p["Operator"]
-        local opLeft = p["Opl"]
-        local opRight = p["Opr"]
+        nameStr = p[1]
+        valueStr = p[2]
 
-        if nil ~= opStr then
-            self.m_operator = NodeParser.parseOperatorType(opStr)
-        elseif nil ~= opLeft then
-            local pParenthesis = string.find(opLeft, '%(')
+        if nameStr == "Operator" then
+            self.m_operator = NodeParser.parseOperatorType(valueStr)
+        elseif nameStr == "Opl" then
+            local pParenthesis = string.find(valueStr, '%(')
             if not pParenthesis then
-                self.m_opl = NodeParser.parseProperty(opLeft)
+                self.m_opl = NodeParser.parseProperty(valueStr)
             else
-                self.m_opl = NodeParser.parseMethod(opLeft)
+                self.m_opl = NodeParser.parseMethod(valueStr)
             end
-        elseif nil ~= opRight then
-            local pParenthesis = string.find(opRight, '%(')
+        elseif nameStr == "Opr" then
+            local pParenthesis = string.find(valueStr, '%(')
             if not pParenthesis then
-                self.m_opr = NodeParser.parseProperty(opRight)
+                self.m_opr = NodeParser.parseProperty(valueStr)
             else
-                self.m_opr = NodeParser.parseMethod(opRight)
+                self.m_opr = NodeParser.parseMethod(valueStr)
             end
         else
             -- maybe others

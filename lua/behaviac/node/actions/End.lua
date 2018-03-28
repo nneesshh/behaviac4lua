@@ -55,22 +55,23 @@ end
 function _M:onLoading(version, agentType, properties)
     _M.super.onLoading(self, version, agentType, properties)
 
+    local nameStr, valueStr
     for _, p in ipairs(properties) do
-        local endStatusStr = p["EndStatus"]
-        local endOutsideStr = p["EndOutside"]
+        nameStr = p[1]
+        valueStr = p[2]
 
-        if nil ~= endStatusStr then
-            if StringUtils.isValidString(endStatusStr) then
-                local pParenthesis = string.find(endStatusStr, '%(')
+        if nameStr == "EndStatus" then
+            if StringUtils.isValidString(valueStr) then
+                local pParenthesis = string.find(valueStr, '%(')
 
                 if not pParenthesis then                    
-                    self.m_endStatus = BehaviorParseFactory.parseProperty(endStatusStr)
+                    self.m_endStatus = BehaviorParseFactory.parseProperty(valueStr)
                 else
-                    self.m_endStatus = BehaviorParseFactory.parseMethod(endStatusStr)
+                    self.m_endStatus = BehaviorParseFactory.parseMethod(valueStr)
                 end
             end
-        elseif nil ~= endOutsideStr then
-            self.m_endOutside = (endOutsideStr == "true")
+        elseif nameStr == "EndOutside" then
+            self.m_endOutside = (valueStr == "true")
         end
     end
 end

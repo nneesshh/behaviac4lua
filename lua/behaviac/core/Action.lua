@@ -61,25 +61,25 @@ end
 function _M:onLoading(version, agentType, properties)
     _M.super.onLoading(self, version, agentType, properties)
 
+    local nameStr, valueStr
     for _, p in ipairs(properties) do
-        local methodStr = p["Method"]
-        local resultOptionStr = p["ResultOption"]
-        local resultFunctorStr = p["ResultFunctor"]
+        nameStr = p[1]
+        valueStr = p[2]
 
-        if nil ~= methodStr then
-            self.m_method = NodeParser.parseMethod(methodStr)
-        elseif nil ~= resultOptionStr then
-            if resultOptionStr == "BT_INVALID" then
+        if nameStr == "Method" then
+            self.m_method = NodeParser.parseMethod(valueStr)
+        elseif nameStr == "ResultOption" then
+            if valueStr == "BT_INVALID" then
                 self.m_resultOption = EBTStatus.BT_INVALID
-            elseif resultOptionStr == "BT_FAILURE" then
+            elseif valueStr == "BT_FAILURE" then
                 self.m_resultOption = EBTStatus.BT_FAILURE
-            elseif resultOptionStr == "BT_RUNNING" then
+            elseif valueStr == "BT_RUNNING" then
                 self.m_resultOption = EBTStatus.BT_RUNNING
             else
                 self.m_resultOption = EBTStatus.BT_SUCCESS
             end
-        elseif nil ~= resultFunctorStr then
-            self.m_resultFunctor = NodeParser.parseMethod(resultFunctorStr)
+        elseif nameStr == "ResultFunctor" then
+            self.m_resultFunctor = NodeParser.parseMethod(valueStr)
         else
             -- do nothing
         end

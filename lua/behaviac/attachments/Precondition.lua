@@ -47,8 +47,6 @@ end
 
 function _M:release()
     _M.super.release(self)
-
-    self.m_ActionConfig = false
 end
 
 function _M:getPhase()

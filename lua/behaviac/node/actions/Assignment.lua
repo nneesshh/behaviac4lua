@@ -58,21 +58,21 @@ end
 function _M:onLoading(version, agentType, properties)
     _M.super.onLoading(self, version, agentType, properties)
 
+    local nameStr, valueStr
     for _, p in ipairs(properties) do
-        local castRightStr = p["CastRight"]
-        local opLeftStr = p["Opl"]
-        local opRightStr = p["Opr"]
+        nameStr = p[1]
+        valueStr = p[2]
 
-        if nil ~= castRightStr then
-            self.m_bCast = (castRightStr == "true")
-        elseif nil ~= opLeftStr then
-            self.m_opl = NodeParser.parseProperty(opLeftStr)
-        elseif nil ~= opRightStr then
-            local pParenthesis = string.find(opRightStr, '%(')
+        if nameStr == "CastRight" then
+            self.m_bCast = (valueStr == "true")
+        elseif nameStr == "Opl" then
+            self.m_opl = NodeParser.parseProperty(valueStr)
+        elseif nameStr == "Opr" then
+            local pParenthesis = string.find(valueStr, '%(')
             if not pParenthesis then
-                self.m_opr = NodeParser.parseProperty(opRightStr)
+                self.m_opr = NodeParser.parseProperty(valueStr)
             else
-                self.m_opr = NodeParser.parseMethod(opRightStr)
+                self.m_opr = NodeParser.parseMethod(valueStr)
             end
         else
             -- _G.BEHAVIAC_ASSERT(0 == "unrecognized property")

@@ -90,43 +90,42 @@ end
 function _M:onLoading(version, agentType, properties)
     _M.super.onLoading(self, version, agentType, properties)
 
+    local nameStr, valueStr
     for _, p in ipairs(properties) do
-        local failurePolicyStr = p["FailurePolicy"]
-        local successPolicyStr = p["SuccessPolicy"]
-        local exitPolicyStr = p["ExitPolicy"]
-        local childFinishPolicyStr = p["ChildFinishPolicy"]
+        nameStr = p[1]
+        valueStr = p[2]
 
-        if nil ~= failurePolicyStr then
-            if failurePolicyStr == "FAIL_ON_ONE" then
+        if nameStr == "FailurePolicy" then
+            if valueStr == "FAIL_ON_ONE" then
                 self.m_failPolicy = EFAILURE_POLICY.FAIL_ON_ONE
-            elseif failurePolicyStr == "FAIL_ON_ALL" then
+            elseif valueStr == "FAIL_ON_ALL" then
                 self.m_failPolicy = EFAILURE_POLICY.FAIL_ON_ALL
             else
-                _G.BEHAVIAC_ASSERT(false, "[_M:onLoading()] FailurePolicy error value = %s", failurePolicyStr)
+                _G.BEHAVIAC_ASSERT(false, "[_M:onLoading()] FailurePolicy error value = %s", valueStr)
             end
-        elseif nil ~= successPolicyStr then
-            if successPolicyStr == "SUCCEED_ON_ONE" then
+        elseif nameStr == "SuccessPolicy" then
+            if valueStr == "SUCCEED_ON_ONE" then
                 self.m_succeedPolicy = ESUCCESS_POLICY.SUCCEED_ON_ONE
-            elseif successPolicyStr == "SUCCEED_ON_ALL" then
+            elseif valueStr == "SUCCEED_ON_ALL" then
                 self.m_succeedPolicy = ESUCCESS_POLICY.SUCCEED_ON_ALL
             else
-                _G.BEHAVIAC_ASSERT(false, "[_M:onLoading()] SuccessPolicy error value = %s", successPolicyStr)
+                _G.BEHAVIAC_ASSERT(false, "[_M:onLoading()] SuccessPolicy error value = %s", valueStr)
             end
-        elseif nil ~= exitPolicyStr then
-            if exitPolicyStr == "EXIT_NONE" then
+        elseif nameStr == "ExitPolicy" then
+            if valueStr == "EXIT_NONE" then
                 self.m_exitPolicy = EEXIT_POLICY.EXIT_NONE
-            elseif exitPolicyStr == "EXIT_ABORT_RUNNINGSIBLINGS" then
+            elseif valueStr == "EXIT_ABORT_RUNNINGSIBLINGS" then
                 self.m_exitPolicy = EEXIT_POLICY.EXIT_ABORT_RUNNINGSIBLINGS
             else
-                _G.BEHAVIAC_ASSERT(false, "[_M:onLoading()] ExitPolicy error value = %s", exitPolicyStr)
+                _G.BEHAVIAC_ASSERT(false, "[_M:onLoading()] ExitPolicy error value = %s", valueStr)
             end
-        elseif childFinishPolicyStr then
-            if childFinishPolicyStr == "CHILDFINISH_ONCE" then
+        elseif nameStr == "ChildFinishPolicy" then
+            if valueStr == "CHILDFINISH_ONCE" then
                 self.m_childFinishPolicy = ECHILDFINISH_POLICY.CHILDFINISH_ONCE
-            elseif childFinishPolicyStr == "CHILDFINISH_LOOP" then
+            elseif valueStr == "CHILDFINISH_LOOP" then
                 self.m_childFinishPolicy = ECHILDFINISH_POLICY.CHILDFINISH_LOOP
             else
-                _G.BEHAVIAC_ASSERT(false, "[_M:onLoading()] ChildFinishPolicy error value = %s", childFinishPolicyStr)
+                _G.BEHAVIAC_ASSERT(false, "[_M:onLoading()] ChildFinishPolicy error value = %s", valueStr)
             end
         else
             -- _G.BEHAVIAC_ASSERT(false)

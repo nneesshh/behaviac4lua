@@ -53,11 +53,13 @@ end
 function _M:onLoading(version, agentType, properties)
     _M.super.onLoading(self, version, agentType, properties)
 
+    local nameStr, valueStr
     for _, p in ipairs(properties) do
-        local weightStr = p["Weight"]
+        nameStr = p[1]
+        valueStr = p[2]
 
-        if nil ~= weightStr then
-            self.m_weight = BehaviorParseFactory.parseProperty(weightStr)
+        if nameStr == "Weight" then
+            self.m_weight = BehaviorParseFactory.parseProperty(valueStr)
         end
     end
 end

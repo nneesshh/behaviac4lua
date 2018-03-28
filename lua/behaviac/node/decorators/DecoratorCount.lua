@@ -53,11 +53,13 @@ end
 function _M:onLoading(version, agentType, properties)
     _M.super.onLoading(self, version, agentType, properties)
 
+    local nameStr, valueStr
     for _, p in ipairs(properties) do
-        local countStr = p["Count"]
+        nameStr = p[1]
+        valueStr = p[2]
 
-        if nil ~= countStr then
-            self.m_count_p = NodeParser.parseProperty(countStr)
+        if nameStr == "Count" then
+            self.m_count_p = NodeParser.parseProperty(valueStr)
         end
     end
 end

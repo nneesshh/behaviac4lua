@@ -59,29 +59,28 @@ end
 function _M:onLoading(version, agentType, properties)
     _M.super.onLoading(self, version, agentType, properties)
 
+    local nameStr, valueStr
     for _, p in ipairs(properties) do
-        local taskStr = p["Task"]
-        local referenceFilenameStr = p["ReferenceFilename"]
-        local triggeredOnceStr = p["TriggeredOnce"]
-        local triggerModeStr = p["TriggerMode"]
+        nameStr = p[1]
+        valueStr = p[2]
 
-        if nil ~= taskStr then
-            self.m_event, self.m_eventName = NodeParser.parseMethodOutMethodName(taskStr)
-        elseif nil ~= referenceFilenameStr then
-            self.m_referencedTreeName = referenceFilenameStr
+        if nameStr == "Task" then
+            self.m_event, self.m_eventName = NodeParser.parseMethodOutMethodName(valueStr)
+        elseif nameStr == "ReferenceFilename" then
+            self.m_referencedTreeName = valueStr
             self.m_referencedTreePath = AgentMeta.getBehaviorTreePath(self.m_referencedTreeName)
             local bt = BehaviorTreeFactory.preloadBehaviorTree(self.m_referencedTreePath)
-        elseif nil ~= triggeredOnceStr then
-            if triggeredOnceStr == "true" then
+        elseif nameStr == "TriggeredOnce" then
+            if valueStr == "true" then
                 self.m_bTriggeredOnce = true
             end
-        elseif nil ~= triggerModeStr then
-            if triggerModeStr == "Transfer" then
+        elseif nameStr == "TriggerMode" then
+            if valueStr == "Transfer" then
                 self.m_triggerMode = TriggerMode.TM_Transfer
-            elseif triggerModeStr == "Return" then
+            elseif valueStr == "Return" then
                 self.m_triggerMode = TriggerMode.TM_Return
             else
-                _G.BEHAVIAC_ASSERT(false, "unrecognised trigger mode %s", triggerModeStr)
+                _G.BEHAVIAC_ASSERT(false, "unrecognised trigger mode %s", valueStr)
             end
         else
             -- _G.BEHAVIAC_ASSERT(0, "unrecognized property")
@@ -107,7 +106,7 @@ end
 
 function _M:switchTo(agent, tick, eventParams)
     if not StringUtils.isNullOrEmpty(self.m_referencedTreePath) then
-        if nil ~= agent then
+        if agent then
             local tm = self:getTriggerMode()
             agent:btEventTree(self.m_referencedTreePath, tm)
             agent.m_blackboard:addLocalVariables(eventParams)

@@ -55,23 +55,24 @@ end
 function _M:onLoading(version, agentType, properties)
     _M.super.onLoading(self, version, agentType, properties)
 
+    local nameStr, valueStr
     for _, p in ipairs(properties) do
-        local opLeftStr = p["Opl"]
-        local opRightStr = p["Opr"]
+        nameStr = p[1]
+        valueStr = p[2]
 
-        if nil ~= opLeftStr then
-            local pParenthesis = string.find(opLeftStr, '%(')
+        if nameStr == "Opl" then
+            local pParenthesis = string.find(valueStr, '%(')
             if not pParenthesis then
-                self.m_Iterator = NodeParser.parseProperty(opLeftStr)
+                self.m_Iterator = NodeParser.parseProperty(valueStr)
             else
-                _G.BEHAVIAC_ASSERT(false, "[_M:onLoading()] Opl if function")
+                _G.BEHAVIAC_ASSERT(false)
             end
-        elseif nil ~= opRightStr then
-            local pParenthesis = string.find(opRightStr, '%(')
+        elseif nameStr == "Opr" then
+            local pParenthesis = string.find(valueStr, '%(')
             if not pParenthesis then
-                self.m_Iterator = NodeParser.parseProperty(opRightStr)
+                self.m_Iterator = NodeParser.parseProperty(valueStr)
             else
-                self.m_Iterator = NodeParser.parseMethod(opRightStr)
+                self.m_Iterator = NodeParser.parseMethod(valueStr)
             end
         else
             -- do nothing

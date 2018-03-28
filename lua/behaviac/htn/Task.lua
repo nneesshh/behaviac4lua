@@ -56,14 +56,15 @@ end
 function _M:onLoading(version, agentType, properties)
     _M.super.onLoading(self, version, agentType, properties)
 
+    local nameStr, valueStr
     for _, p in ipairs(properties) do
-        local prototypeStr = p["Prototype"]
-        local isHTNStr = p["IsHTN"]
+        nameStr = p[1]
+        valueStr = p[2]
 
-        if nil ~= prototypeStr then
-            self.m_task = NodeParser.parseMethod(prototypeStr)
-        elseif nil ~= isHTNStr then
-            self.m_bHTN = (isHTNStr == "true")
+        if nameStr == "Prototype" then
+            self.m_task = NodeParser.parseMethod(valueStr)
+        elseif nameStr == "IsHTN" then
+            self.m_bHTN = (valueStr == "true")
         else
             -- _G.BEHAVIAC_ASSERT(0, "unrecognized property")
         end

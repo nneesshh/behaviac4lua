@@ -53,15 +53,17 @@ end
 function _M:onLoading(version, agentType, properties)
     _M.super.onLoading(self, version, agentType, properties)
 
+    local nameStr, valueStr
     for _, p in ipairs(properties) do
-        local framesStr = p["Frames"]
+        nameStr = p[1]
+        valueStr = p[2]
 
-        if nil ~= framesStr then
-            local pParenthesis = string.find(framesStr, '%(')
+        if nameStr == "Frames" then
+            local pParenthesis = string.find(valueStr, '%(')
             if not pParenthesis then
-                self.m_frames_p = BehaviorParseFactory.parseProperty(framesStr)
+                self.m_frames_p = BehaviorParseFactory.parseProperty(valueStr)
             else
-                self.m_frames_p = BehaviorParseFactory.parseMethod(framesStr)
+                self.m_frames_p = BehaviorParseFactory.parseMethod(valueStr)
             end
         end
     end

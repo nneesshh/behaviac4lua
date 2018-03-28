@@ -58,12 +58,14 @@ end
 function _M:onLoading(version, agentType, properties)
     _M.super.onLoading(self, version, agentType, properties)
 
+    local nameStr, valueStr
     for _, p in ipairs(properties) do
-        local randomGeneratorStr = p["RandomGenerator"]
+        nameStr = p[1]
+        valueStr = p[2]
 
-        if nil ~= randomGeneratorStr then
-            if randomGeneratorStr[0] ~= "" then
-                self.m_randomGenerator = NodeParser.parseMethod(randomGeneratorStr)
+        if nameStr == "RandomGenerator" then
+            if valueStr[0] ~= "" then
+                self.m_randomGenerator = NodeParser.parseMethod(valueStr)
             end
         else
             -- _G.BEHAVIAC_ASSERT(0, "unrecognized property")

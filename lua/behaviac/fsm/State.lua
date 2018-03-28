@@ -55,14 +55,15 @@ end
 function _M:onLoading(version, agentType, properties)
     _M.super.onLoading(self, version, agentType, properties)
 
+    local nameStr, valueStr
     for _, p in ipairs(properties) do
-        local methodStr = p["Method"]
-        local isEndStateStr = p["IsEndState"]
+        nameStr = p[1]
+        valueStr = p[2]
 
-        if nil ~= methodStr then
-            self.m_method = NodeParser.parseMethod(methodStr)
-        elseif nil ~= isEndStateStr then
-            self.m_bIsEndState = (isEndStateStr == "true")
+        if nameStr == "Method" then
+            self.m_method = NodeParser.parseMethod(valueStr)
+        elseif nameStr == "IsEndState" then
+            self.m_bIsEndState = (valueStr == "true")
         else
             -- _G.BEHAVIAC_ASSERT(0, "unrecognized property")
         end
@@ -74,7 +75,7 @@ function _M:attach(pAttachment, bIsPrecondition, bIsEffector, bIsTransition)
         _G.BEHAVIAC_ASSERT(not bIsEffector and not bIsPrecondition, "Transition flag conficts with effector and precondition flag")
 
         local pTransition = pAttachment
-        _G.BEHAVIAC_ASSERT(nil ~= pTransition, "Transition node cann't be nil")
+        _G.BEHAVIAC_ASSERT(pTransition, "Transition node cann't be nil")
         return table.insert(self.m_transitions, pTransition)
     else
         return _M.super.attach(self, pAttachment, bIsPrecondition, bIsEffector, bIsTransition)

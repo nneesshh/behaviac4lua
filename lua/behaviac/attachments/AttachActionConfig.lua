@@ -46,40 +46,39 @@ function _M:ctor()
     --self.m_comparator  = false
 end
 
-function _M:load(properties)
+function _M:parse(properties)
+    local nameStr, valueStr
     for _, p in ipairs(properties) do
-        local opLeftStr = p["Opl"]
-        local opRightStr1 = p["Opr1"]
-        local opStr = p["operator"]
-        local opRightStr2 = p["Opr2"]
+        nameStr = p[1]
+        valueStr = p[2]
 
-        if nil ~= opLeftStr then
-            if StringUtils.isValidString(opLeftStr) then
-                local pParenthesis = string.find(opLeftStr, '%(')
+        if nameStr == "Opl" then
+            if StringUtils.isValidString(valueStr) then
+                local pParenthesis = string.find(valueStr, '%(')
                 if not pParenthesis then
-                    self.m_opl = NodeParser.parseProperty(opLeftStr)
+                    self.m_opl = NodeParser.parseProperty(valueStr)
                 else
-                    self.m_opl = NodeParser.parseMethod(opLeftStr)
+                    self.m_opl = NodeParser.parseMethod(valueStr)
                 end
             end
-        elseif nil ~= opRightStr1 then
-            if StringUtils.isValidString(opRightStr1) then
-                local pParenthesis = string.find(opRightStr1, '%(')
+        elseif nameStr == "Opr1" then
+            if StringUtils.isValidString(valueStr) then
+                local pParenthesis = string.find(valueStr, '%(')
                 if not pParenthesis then
-                    self.m_opr1 = NodeParser.parseProperty(opRightStr1)
+                    self.m_opr1 = NodeParser.parseProperty(valueStr)
                 else
-                    self.m_opr1 = NodeParser.parseMethod(opRightStr1)
+                    self.m_opr1 = NodeParser.parseMethod(valueStr)
                 end
             end
-        elseif nil ~= opStr then
-            self.m_operator = NodeParser.parseOperatorType(opStr)
-        elseif nil ~= opRightStr2 then
-            if StringUtils.isValidString(opRightStr2) then
-                local pParenthesis = string.find(opRightStr2, '%(')
+        elseif nameStr == "Operator" then
+            self.m_operator = NodeParser.parseOperatorType(valueStr)
+        elseif nameStr == "Opr2" then
+            if StringUtils.isValidString(valueStr) then
+                local pParenthesis = string.find(valueStr, '%(')
                 if not pParenthesis then
-                    self.m_opr2 = NodeParser.parseProperty(opRightStr2)
+                    self.m_opr2 = NodeParser.parseProperty(valueStr)
                 else
-                    self.m_opr2 = NodeParser.parseMethod(opRightStr2)
+                    self.m_opr2 = NodeParser.parseMethod(valueStr)
                 end
             end
         else
@@ -87,7 +86,7 @@ function _M:load(properties)
         end
     end
 
-    return self.m_opl
+    return self.m_opl ~= nil
 end
 
 function _M:execute(agent)

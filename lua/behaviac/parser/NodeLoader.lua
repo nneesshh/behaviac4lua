@@ -42,7 +42,9 @@ function _M.loadProperties(selfNode, version, agentType, dataEntry)
 
     local properties = {}
     for _, oneProperty in ipairs(thisEntry) do
-        table.insert(properties, oneProperty)
+        for k, v in pairs(oneProperty) do
+            table.insert(properties, { k, v })
+        end
     end
 
     if #properties > 0 then

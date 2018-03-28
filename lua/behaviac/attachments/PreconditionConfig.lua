@@ -44,34 +44,37 @@ function _M:ctor()
     self.__name   =  "PreconditionConfig"
 end
 
-function _M:load(properties)
-    local loaded = _M.super.load(self, properties)
+function _M:parse(properties)
+    local success = _M.super.parse(self, properties)
 
+    local nameStr, valueStr
     for _, p in ipairs(properties) do
-        local binaryOpStr = p["BinaryOperator"]
-        local phaseStr = p["Phase"]
+        nameStr = p[1]
+        valueStr = p[2]
 
-        if nil ~= binaryOpStr then
-            if binaryOpStr == "Or" then
+        if nameStr == "BinaryOperator" then
+            if valueStr == "Or" then
                 self.m_bAnd = false
-            elseif binaryOpStr == "And" then
+            elseif valueStr == "And" then
                 self.m_bAnd = true
             else
-                _G.BEHAVIAC_ASSERT(false, "[_M:load()] BinaryOperator")
+                _G.BEHAVIAC_ASSERT(false, "[_M:parse()] BinaryOperator")
             end
-        elseif nil ~= phaseStr then
-            if phaseStr == "Enter" then
+        elseif nameStr == "Phase" then
+            if valueStr == "Enter" then
                 self.m_phase = EPreconditionPhase.E_ENTER
-            elseif phaseStr == "Update" then
+            elseif valueStr == "Update" then
                 self.m_phase = EPreconditionPhase.E_UPDATE
-            elseif phaseStr == "Both" then
+            elseif valueStr == "Both" then
                 self.m_phase = EPreconditionPhase.E_BOTH
             else
-                _G.BEHAVIAC_ASSERT(false, "[_M:load()] Phase")
+                _G.BEHAVIAC_ASSERT(false, "[_M:parse()] Phase")
             end
             break
         end
     end
+
+    return success
 end
 
 return _M

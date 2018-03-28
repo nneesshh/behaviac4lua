@@ -52,11 +52,13 @@ end
 function _M:onLoading(version, agentType, properties)
     _M.super.onLoading(self, version, agentType, properties)
 
+    local nameStr, valueStr
     for _, p in ipairs(properties) do
-        local decorateWhenChildEndsStr = p["DecorateWhenChildEnds"]
+        nameStr = p[1]
+        valueStr = p[2]
 
-        if nil ~= decorateWhenChildEndsStr then
-            if decorateWhenChildEndsStr == "true" then
+        if nameStr == "DecorateWhenChildEnds" then
+            if valueStr == "true" then
                 self.m_bDecorateWhenChildEnds = true
             end
         else
