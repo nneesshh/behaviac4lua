@@ -109,9 +109,10 @@ local path_StructBT = AgentMeta.getBehaviorTreePath("StructBT")
 local path_EnumBT = AgentMeta.getBehaviorTreePath("EnumBT.bson.bytes")
 
 local path_islandBattle = AgentMeta.getBehaviorTreePath("islandBattle")
+local path_task = AgentMeta.getBehaviorTreePath("task")
 
 -- force load
-BehaviorTreeFactory.loadBehaviorTree(path_maintree_task .. ".json")
+BehaviorTreeFactory.loadBehaviorTree(path_task .. ".json")
 
 AgentMeta.registerEnumType("FirstEnum", { e1 = 0, e2 = 1 })
 --myRobot:btSetCurrent(path_islandBattle)

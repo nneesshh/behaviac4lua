@@ -1,0 +1,51 @@
+{
+	"behavior": {
+		"name": "EnumBT",
+		"agenttype": "FirstAgent",
+		"version": "5",
+		"properties": [],
+		"node": {
+			"class": "Sequence",
+			"id": "0",
+			"properties": [],
+			"children": [{
+				"node": {
+					"class": "Assignment",
+					"id": "3",
+					"properties": [{
+						"CastRight": "false"
+					}, {
+						"Opl": "FirstEnum Self.FirstAgent::p1"
+					}, {
+						"Opr": "const FirstEnum e2"
+					}],
+					"children": []
+				}
+			}, {
+				"node": {
+					"class": "Condition",
+					"id": "1",
+					"properties": [{
+						"Operator": "Equal"
+					}, {
+						"Opl": "FirstEnum Self.FirstAgent::p1"
+					}, {
+						"Opr": "const FirstEnum e2"
+					}],
+					"children": []
+				}
+			}, {
+				"node": {
+					"class": "Action",
+					"id": "2",
+					"properties": [{
+						"Method": "Self.FirstAgent::SayHello()"
+					}, {
+						"ResultOption": "BT_SUCCESS"
+					}],
+					"children": []
+				}
+			}]
+		}
+	}
+}

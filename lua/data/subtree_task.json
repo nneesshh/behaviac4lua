@@ -1,54 +1,71 @@
 {
-	"behavior": {
-		"name": "subtree_task",
-		"agenttype": "FirstAgent",
-		"version": "5",
-		"properties": [],
-		"pars": [{
-			"name": "_$local_task_param_$_0",
-			"type": "int",
-			"value": "0"
-		}],
-		"node": {
-			"class": "Task",
-			"id": "3",
-			"properties": [{
-				"Prototype": "Self.FirstAgent::event_task(0)"
-			}, {
-				"IsHTN": "false"
-			}],
-			"children": [{
-				"node": {
-					"class": "Sequence",
-					"id": "0",
-					"properties": [],
-					"children": [{
-						"node": {
-							"class": "Condition",
-							"id": "1",
-							"properties": [{
-								"Operator": "Equal"
-							}, {
-								"Opl": "int Self.FirstAgent::_$local_task_param_$_0"
-							}, {
-								"Opr": "const int 2"
-							}],
-							"children": []
-						}
-					}, {
-						"node": {
-							"class": "Action",
-							"id": "2",
-							"properties": [{
-								"Method": "Self.FirstAgent::Say(\"Hello subtree!\")"
-							}, {
-								"ResultOption": "BT_SUCCESS"
-							}],
-							"children": []
-						}
-					}]
-				}
-			}]
-		}
-	}
+  "behavior": {
+    "name": "subtree_task",
+    "agenttype": "FirstAgent",
+    "version": "5",
+    "properties": [],
+    "pars": [
+      {
+        "name": "_$local_task_param_$_0",
+        "type": "int",
+        "value": "0"
+      }
+    ],
+    "node": {
+      "class": "Task",
+      "id": "3",
+      "properties": [
+        {
+          "Prototype": "Self.FirstAgent::t1(0)"
+        },
+        {
+          "IsHTN": "false"
+        }
+      ],
+      "children": [
+        {
+          "node": {
+            "class": "Sequence",
+            "id": "0",
+            "properties": [],
+            "children": [
+              {
+                "node": {
+                  "class": "Condition",
+                  "id": "1",
+                  "properties": [
+                    {
+                      "Operator": "Equal"
+                    },
+                    {
+                      "Opl": "int Self.FirstAgent::_$local_task_param_$_0"
+                    },
+                    {
+                      "Opr": "const int 2"
+                    }
+                  ],
+                  "children": []
+                }
+              },
+              {
+                "node": {
+                  "class": "Action",
+                  "id": "2",
+                  "properties": [
+                    {
+                      "Method": "Self.FirstAgent::Say(\"Hello subtree_task!\")"
+                    },
+                    {
+                      "ResultOption": "BT_SUCCESS"
+                    }
+                  ],
+                  "children": []
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
 }

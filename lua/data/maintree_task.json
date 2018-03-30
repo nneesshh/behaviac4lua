@@ -1,79 +1,65 @@
 {
-	"behavior": {
-		"name": "maintree_task",
-		"agenttype": "FirstAgent",
-		"version": "5",
-		"properties": [],
-		"node": {
-			"class": "Sequence",
-			"id": "0",
-			"properties": [],
-			"attachments": [{
-				"class": "Event",
-				"id": "1",
-				"precondition": false,
-				"effector": false,
-				"transition": false,
-				"event": true,
-				"properties": [{
-					"ReferenceFilename": "subtree_task"
-				}, {
-					"Task": "Self.FirstAgent::event_task(0)"
-				}, {
-					"TriggeredOnce": "false"
-				}, {
-					"TriggerMode": "Return"
-				}]
-			}],
-			"children": [{
-				"node": {
-					"class": "Action",
-					"id": "4",
-					"properties": [{
-						"Method": "Self.FirstAgent::Say(\"Wait subtree...\")"
-					}, {
-						"ResultOption": "BT_RUNNING"
-					}],
-					"children": []
-				}
-			}, {
-				"node": {
-					"class": "Assignment",
-					"id": "3",
-					"properties": [{
-						"CastRight": "false"
-					}, {
-						"Opl": "int Self.FirstAgent::p1"
-					}, {
-						"Opr": "const int 1"
-					}],
-					"children": []
-				}
-			}, {
-				"node": {
-					"class": "Condition",
-					"id": "2",
-					"properties": [{
-						"Operator": "Equal"
-					}, {
-						"Opl": "int Self.FirstAgent::p1"
-					}, {
-						"Opr": "const int 1"
-					}],
-					"children": []
-				}
-			}, {
-				"node": {
-					"class": "Action",
-					"id": "5",
-					"properties": [{
-						"Method": "Self.FirstAgent::Say(\"Hello maintree!\")"
-					}, {
-						"ResultOption": "BT_SUCCESS"
-					}],
-					"children": []
-				}
-			}]
-		}
-	}
+  "behavior": {
+    "name": "maintree_task",
+    "agenttype": "FirstAgent",
+    "version": "5",
+    "properties": [],
+    "node": {
+      "class": "Sequence",
+      "id": "0",
+      "properties": [],
+      "children": [
+        {
+          "node": {
+            "class": "Assignment",
+            "id": "3",
+            "properties": [
+              {
+                "CastRight": "false"
+              },
+              {
+                "Opl": "int Self.FirstAgent::p1"
+              },
+              {
+                "Opr": "const int 1"
+              }
+            ],
+            "children": []
+          }
+        },
+        {
+          "node": {
+            "class": "Condition",
+            "id": "2",
+            "properties": [
+              {
+                "Operator": "Equal"
+              },
+              {
+                "Opl": "int Self.FirstAgent::p1"
+              },
+              {
+                "Opr": "const int 1"
+              }
+            ],
+            "children": []
+          }
+        },
+        {
+          "node": {
+            "class": "ReferencedBehavior",
+            "id": "5",
+            "properties": [
+              {
+                "ReferenceBehavior": "const string \"subtree_task\""
+              },
+              {
+                "Task": "Self.FirstAgent::t1(2)"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
 }
