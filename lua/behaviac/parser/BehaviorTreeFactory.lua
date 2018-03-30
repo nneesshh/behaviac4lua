@@ -10,7 +10,10 @@ local _M = {}
 local pdir = (...):gsub('%.[^%.]+%.[^%.]+$', '') .. "."
 local cwd = (...):gsub('%.[^%.]+$', '') .. "."
 
+local common = require(ppdir .. "common")
 local lib_loader = require(cwd .. "loader")
+
+local Logging = common.d_log
 
 _M.btCache = {} 
 

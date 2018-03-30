@@ -40,7 +40,7 @@ local NodeParser = require(ppdir .. "parser.NodeParser")
 
 -- ctor
 function _M:ctor()
-    _M.super.ctro(self)
+    _M.super.ctor(self)
 end
 
 function _M:release()
