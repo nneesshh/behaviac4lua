@@ -112,7 +112,7 @@ end
 function _M:execute(agent, tick)
     local status = EBTStatus.BT_RUNNING
     if self.m_method then
-        self.m_method:run(agent)
+        self.m_method:run(agent, tick)
     else
         status = self:evaluateImpl(agent, tick, EBTStatus.BT_RUNNING)
     end
@@ -125,14 +125,14 @@ function _M:executeAction(agent, tick, childStatus)
     local status = EBTStatus.BT_SUCCESS
     if self.m_method then
         if self.m_resultOption ~= EBTStatus.BT_INVALID then
-            self.m_method:run(agent)
+            self.m_method:run(agent, tick)
             status = self.m_resultOption
         else
             local val = nil
             if self.m_resultFunctor then
-                val = self.m_resultFunctor:getValueFrom(agent, self.m_method)
+                val = self.m_resultFunctor:getValueFrom(agent, tick, self.m_method)
             else
-                val = self.m_method:getValue(agent)
+                val = self.m_method:getValue(agent, tick)
             end
             status = val and tonumber(val) or EBTStatus.BT_FAILURE
         end

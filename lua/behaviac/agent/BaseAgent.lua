@@ -51,10 +51,6 @@ function _M:ctor()
     self.m_behaviorTreeTicks      = {}
 
     self.m_referencetree          = false
-
-    self.m_lastExecutingTreeTick  = false
-    self.m_executingTreeTick      = false
-
 end
 
 function _M:release()
@@ -245,16 +241,6 @@ end
 
 function _M:getCurrentTreeTick()
     return self.m_currentTreeTick
-end
-
-function _M:pushExecutingTreeTick(tick)
-    self.m_lastExecutingTreeTick = self.m_executingTreeTick
-    self.m_executingTreeTick = tick
-end
-
-function _M:popExecutingTreeTick()
-    self.m_executingTreeTick = self.m_lastExecutingTreeTick
-    return self.m_executingTreeTick
 end
 
 return _M

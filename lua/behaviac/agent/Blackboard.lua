@@ -16,7 +16,7 @@ local _M = Blackboard
 -- ctor
 function _M:ctor(agent)
     self.m_agent       = agent
-    self.m_baseMemory  = { localVars = {} }
+    self.m_baseMemory  = { }
     self.m_treeMemory  = { }
 end
 
@@ -36,28 +36,6 @@ end
 function _M.s_getTreeNode(treeMem, key, nodeScope) 
     local nodeMem = _M.s_getNodeMem(treeMem, nodeScope)
     return nodeMem[key]
-end
-
-function _M:setLocalVariable(varName, var) 
-    local memory = self.m_baseMemory.localVars
-    memory[varName] = var
-end
-
-function _M:addLocalVariables(vars)
-    if #vars > 0 then
-        local varName, var
-        local memory = self.m_baseMemory.localVars
-         for _, v in ipairs(vars) do
-            varName = v[1]
-            var = v[2]
-            memory[varName] = var
-         end
-    end
-end
-
-function _M:getLocalVariable(varName)
-    local memory = self.m_baseMemory.localVars
-    return memory[varName]
 end
 
 function _M:getTreeMemory(treeScope) 

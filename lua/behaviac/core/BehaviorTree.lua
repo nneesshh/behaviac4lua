@@ -180,12 +180,10 @@ function _M:init(tick)
 end
 
 function _M:onEnter(agent, tick)
-    agent:pushExecutingTreeTick(tick)
     return true
 end
 
 function _M:onExit(agent, tick, status)
-    agent:popExecutingTreeTick()
     return _M.super.onExit(self, agent, status)
 end
 
@@ -232,7 +230,7 @@ end
 
 function _M:instantiatePars(tick)
     if #self.m_localProps > 0 then
-        tick.m_blackboard:addLocalVariables(self.m_localProps)
+        tick:addLocalVariables(self.m_localProps)
     end
 end
 

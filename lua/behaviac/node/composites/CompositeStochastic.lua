@@ -135,10 +135,10 @@ function _M:randomChild(agent, tick)
             method = pNode.m_method
         end
         
-        local index1 = math.ceil(n * common.getRandomValue(method, agent))
+        local index1 = math.ceil(n * common.getRandomValue(method, agent, tick))
         _G.BEHAVIAC_ASSERT(index1 <= n)
 
-        local index2 = math.ceil(n * common.getRandomValue(method, agent))
+        local index2 = math.ceil(n * common.getRandomValue(method, agent, tick))
         _G.BEHAVIAC_ASSERT(index2 <= n)
 
         -- swap

@@ -41,13 +41,13 @@ local NodeParser = require(ppdir .. "parser.NodeParser")
 function _M:ctor()
     _M.super.ctor(self)
 
-    self.m_weight = false
+    self.m_weight_p = false
 end
 
 function _M:release()
     _M.super.release(self)
     
-    self.m_weight = false
+    self.m_weight_p = false
 end
 
 function _M:onLoading(version, agentType, properties)
@@ -59,13 +59,13 @@ function _M:onLoading(version, agentType, properties)
         valueStr = p[2]
 
         if nameStr == "Weight" then
-            self.m_weight = BehaviorParseFactory.parseProperty(valueStr)
+            self.m_weight_p = NodeParser.parseProperty(valueStr)
         end
     end
 end
 
-function _M:getWeight(agent)
-    return self.m_weight and self.m_weight:getValue(agent) or 0
+function _M:getWeightP()
+    return self.m_weight_p and self.m_weight_p:getValue() or 0
 end
 
 function _M:isManagingChildrenAsSubTrees()

@@ -64,8 +64,8 @@ function _M:onLoading(version, agentType, properties)
     end
 end
 
-function _M:getCountP(agent)
-    return self.m_count_p and self.m_count_p:getValue(agent) or 0
+function _M:getCountP()
+    return self.m_count_p and self.m_count_p:getValue() or 0
 end
 
 function _M:isDecoratorCount()
@@ -89,7 +89,7 @@ end
 function _M:onEnter(agent, tick)
     _M.super.onEnter(self, tick)
 
-    local countP = self:getCountP(agent)
+    local countP = self:getCountP()
     if countP == 0 then
         return false
     end

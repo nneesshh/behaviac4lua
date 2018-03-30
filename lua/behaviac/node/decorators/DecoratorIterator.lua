@@ -80,20 +80,6 @@ function _M:onLoading(version, agentType, properties)
     end
 end
 
-function _M:iterateIt(agent, index, outCount)
-    if self.m_opl and self.m_opr then
-        outCount = self.m_opr:getValue(agent)
-        if index >= 0 and index < outCount then
-            self.m_opl:setValueElement(agent, self.m_opr, index)
-            return true, outCount
-        end
-    else
-        _G.BEHAVIAC_ASSERT(false, "[_M:iterateIt()] ")
-    end
-
-    return false, outCount
-end
-
 function _M:isDecoratorIterator()
     return true
 end

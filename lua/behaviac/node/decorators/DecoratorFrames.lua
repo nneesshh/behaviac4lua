@@ -61,16 +61,16 @@ function _M:onLoading(version, agentType, properties)
         if nameStr == "Frames" then
             local pParenthesis = string.find(valueStr, '%(')
             if not pParenthesis then
-                self.m_frames_p = BehaviorParseFactory.parseProperty(valueStr)
+                self.m_frames_p = NodeParser.parseProperty(valueStr)
             else
-                self.m_frames_p = BehaviorParseFactory.parseMethod(valueStr)
+                self.m_frames_p = NodeParser.parseMethod(valueStr)
             end
         end
     end
 end
 
-function _M:getFramesP(agent)
-    return self.m_frames_p and self.m_frames_p:getValue(agent) or 0
+function _M:getFramesP()
+    return self.m_frames_p and self.m_frames_p:getValue() or 0
 end
 
 function _M:isDecoratorFrames()
@@ -90,7 +90,7 @@ end
 
 function _M:onEnter(agent, tick)
     self:setStart(tick, common.getFrames())
-    self:setFrames(tick, self:getFramesP(agent) or 0)
+    self:setFrames(tick, self:getFramesP() or 0)
 
     return self:getFrames() > 0
 end

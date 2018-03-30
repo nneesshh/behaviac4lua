@@ -42,14 +42,15 @@ local NodeParser = require(ppdir .. "parser.NodeParser")
 function _M:ctor()
     _M.super.ctor(self)
 
-    self.m_endStatus    = false
-    self.m_endOutside   = false
+    self.m_end_status_p   = false
+    self.m_end_outside_p  = false
 end
 
 function _M:release()
     _M.super.release()
     
-    self.m_endStatus    = false
+    self.m_end_status_p   = false
+    self.m_end_outside_p  = false
 end
 
 function _M:onLoading(version, agentType, properties)
@@ -65,20 +66,20 @@ function _M:onLoading(version, agentType, properties)
                 local pParenthesis = string.find(valueStr, '%(')
 
                 if not pParenthesis then                    
-                    self.m_endStatus = BehaviorParseFactory.parseProperty(valueStr)
+                    self.m_end_status_p = NodeParser.parseProperty(valueStr)
                 else
-                    self.m_endStatus = BehaviorParseFactory.parseMethod(valueStr)
+                    self.m_end_status_p = NodeParser.parseMethod(valueStr)
                 end
             end
         elseif nameStr == "EndOutside" then
-            self.m_endOutside = (valueStr == "true")
+            self.m_end_outside_p = (valueStr == "true")
         end
     end
 end
 
-function _M:getStatus(agent)
-    if self.m_endStatus then
-        local status = self.m_endStatus:getValue(agent)
+function _M:getStatus(agent, tick)
+    if self.m_end_status_p then
+        local status = self.m_end_status_p:getValue(agent, tick)
         -- _G.BEHAVIAC_ASSERT(status == EBTStatus.BT_SUCCESS or status == EBTStatus.BT_FAILURE, "[_M:getStatus()] status must be BT_SUCCESS BT_FAILURE")
         return status
     else
@@ -87,7 +88,7 @@ function _M:getStatus(agent)
 end
 
 function _M:getEndOutside()
-    return self.m_endOutside
+    return self.m_end_outside_p
 end
 
 function _M:isEnd()

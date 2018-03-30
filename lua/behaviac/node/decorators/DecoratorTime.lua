@@ -63,19 +63,16 @@ function _M:onLoading(version, agentType, properties)
         if nameStr == "Time" then
             local pParenthesis = string.find(valueStr, "%(")
             if not pParenthesis then
-                self.m_time_p = BehaviorParseFactory.parseProperty(valueStr)
+                self.m_time_p = NodeParser.parseProperty(valueStr)
             else
-                self.m_time_p = BehaviorParseFactory.parseMethod(valueStr)
+                self.m_time_p = NodeParser.parseMethod(valueStr)
             end
         end
     end
 end
 
-function _M:getTimeP(agent)
-    if self.m_time_p then
-        return self.m_time_p
-    end
-    return agent:getTime()
+function _M:getTimeP()
+    return self.m_time_p and self.m_time_p:getValue() or 0
 end
 
 function _M:isDecoratorTime()
@@ -95,7 +92,7 @@ end
 
 function _M:onEnter(agent, tick)
     self:setStart(tick, common.getClock())
-    self:setTime(tick, self:getTimeP(agent) or 0)
+    self:setTime(tick, self:getTimeP() or 0)
 
     return self:getTime(tick) > 0 
 end

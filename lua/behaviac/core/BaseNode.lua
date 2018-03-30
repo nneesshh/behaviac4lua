@@ -354,7 +354,7 @@ function _M:checkEvents(agent, tick, eventName, eventParams)
             if event:isEvent() and not StringUtils.isNullOrEmpty(eventName) then
                 local en = event:getEventName()
                 if not StringUtils.isNullOrEmpty(en) and en == eventName then
-                    event:switchTo(agent, tick, eventParams)
+                    event:switchTo(agent, eventParams)
                     if event:triggeredOnce() then
                         return false
                     end

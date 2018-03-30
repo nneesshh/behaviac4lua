@@ -110,7 +110,7 @@ end
 
 function _M:evaluate(agent, tick)
     if self.m_opl and self.m_opr then
-        return self.m_opl:compare(agent, self.m_opr, self.m_operator)
+        return self.m_opl:compare(agent, tick, self.m_opr, self.m_operator)
     else
         local result = self:evaluateImpl(agent, tick, EBTStatus.BT_INVALID)
         return result == EBTStatus.BT_SUCCESS

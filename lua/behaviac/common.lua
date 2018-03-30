@@ -278,9 +278,9 @@ function _M.getFrames()
     return os.time()
 end
 
-function _M.getRandomValue(method, agent)
+function _M.getRandomValue(method, agent, tick)
     if nil ~= method then
-        return method:getValue(agent)
+        return method:getValue(agent, tick)
     end
 
     return math.random(10000)/10000

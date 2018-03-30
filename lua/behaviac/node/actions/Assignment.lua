@@ -102,7 +102,7 @@ function _M:update(agent, tick, childStatus)
     local status = EBTStatus.BT_SUCCESS
 
     if self.m_opl then
-        self.m_opl:setValueCast(agent, self.m_opr, self.m_bCast)
+        self.m_opl:setValueCast(agent, tick, self.m_opr, self.m_bCast)
     else
         status = self:evaluateImpl(agent, tick, childStatus)
     end

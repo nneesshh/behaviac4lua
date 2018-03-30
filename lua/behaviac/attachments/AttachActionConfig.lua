@@ -89,30 +89,28 @@ function _M:parse(properties)
     return self.m_opl ~= nil
 end
 
-function _M:execute(agent)
+function _M:execute(agent, tick)
     local bValid = false
     -- action
     if self.m_opl and self.m_operator == EOperatorType.E_INVALID then
         bValid = true
-        if self.m_opl.run then
-            self.m_opl:run(agent)
-        end
+        self.m_opl:run(agent, tick)
     -- assign
     elseif self.m_operator == EOperatorType.E_ASSIGN then
         if self.m_opl then
-            self.m_opl:setValueCast(agent, self.m_opr2, false)
+            self.m_opl:setValueCast(agent, tick, self.m_opr2, false)
             bValid = true
         end
     -- compute
     elseif self.m_operator >= EOperatorType.E_ADD and self.m_operator <= EOperatorType.E_DIV then
         if self.m_opl then
-            self.m_opl:compute(agent, self.m_opr1, self.m_opr2, self.m_operator)
+            self.m_opl:compute(agent, tick, self.m_opr1, self.m_opr2, self.m_operator)
             bValid = true
         end
     -- compare
     elseif self.m_operator >= EOperatorType.E_EQUAL and self.m_operator <= EOperatorType.E_LESSEQUAL then
         if self.m_opl then
-            bValid = self.m_opl:compare(agent, self.m_opr2, self.m_operator)
+            bValid = self.m_opl:compare(agent, tick, self.m_opr2, self.m_operator)
         end
     end
     return bValid

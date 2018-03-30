@@ -62,7 +62,7 @@ end
 --------------------------------------------------------------------------------
 
 function _M:evaluate(agent, tick)
-    local bValid = self.m_ActionConfig:execute(agent)
+    local bValid = self.m_ActionConfig:execute(agent, tick)
     if not bValid then
         childStatus = EBTStatus.BT_INVALID
         bValid = (EBTStatus.BT_SUCCESS == self:evaluateImpl(agent, tick, childStatus))
@@ -73,7 +73,7 @@ end
 
 function _M:evaluateWithStatus(agent, tick, status)
     -- BEHAVIAC_UNUSED_VAR status
-    local bValid = self.m_ActionConfig:execute(agent)
+    local bValid = self.m_ActionConfig:execute(agent, tick)
     if not bValid then
         childStatus = EBTStatus.BT_INVALID
         bValid = (EBTStatus.BT_SUCCESS == self:evaluateImpl(agent, tick, childStatus))

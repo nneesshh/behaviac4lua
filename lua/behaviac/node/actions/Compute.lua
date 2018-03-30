@@ -112,7 +112,7 @@ function _M:update(agent, tick, childStatus)
     local status = EBTStatus.BT_SUCCESS
 
     if self.m_opl then
-        self.m_opl:compute(agent, self.m_opr1, self.m_opr2, self.m_operator)
+        self.m_opl:compute(agent, tick, self.m_opr1, self.m_opr2, self.m_operator)
     else
         status = self:evaluateImpl(agent, tick, childStatus)
     end

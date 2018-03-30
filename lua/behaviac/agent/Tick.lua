@@ -39,10 +39,11 @@ local Blackboard = require(cwd .. "Blackboard")
 
 -- ctor
 function _M:ctor(bt, blackboard)
-    self.m_bt = bt
-    self.m_blackboard = blackboard
+    self.m_bt          = bt
+    self.m_blackboard  = blackboard
 
-    self.m_tickMem = blackboard:getTreeMemory(self)
+    self.m_tickMem     = blackboard:getTreeMemory(self)
+    self.m_localVars   = {}
 end
 
 function _M:init()
@@ -282,6 +283,25 @@ end
 
 function _M:getNodeMem(key, node)
     return Blackboard.s_getTreeNode(self.m_tickMem, key, node)
+end
+
+function _M:setLocalVariable(varName, var) 
+    self.m_localVars[varName] = var
+end
+
+function _M:addLocalVariables(vars)
+    if #vars > 0 then
+        local varName, var
+         for _, v in ipairs(vars) do
+            varName = v[1]
+            var = v[2]
+            self.m_localVars[varName] = var
+         end
+    end
+end
+
+function _M:getLocalVariable(varName)
+    return self.m_localVars[varName]
 end
 
 return _M

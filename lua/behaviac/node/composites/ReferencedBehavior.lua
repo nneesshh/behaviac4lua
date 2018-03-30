@@ -45,19 +45,19 @@ local State = require(ppdir .. "fsm.State")
 function _M:ctor()
     _M.super.ctor(self)
 
-    self.m_referencedBehavior  = false
-    self.m_referencedTreePath  = ""
+    self.m_referenced_behavior_p  = false
+    self.m_referencedTreePath     = ""
 
-    self.m_taskPrototype                = false
-    self.m_transitions         = false
-    self.m_taskPrototypeNode            = false
+    self.m_taskPrototype          = false
+    self.m_transitions            = false
+    self.m_taskPrototypeNode      = false
 end
 
 function _M:release()
     _M.super.release(self)
 
-    self.m_referencedBehavior  = false
-    self.m_taskPrototype                = false
+    self.m_referenced_behavior_p  = false
+    self.m_taskPrototype          = false
 end
 
 function _M:onLoading(version, agentType, properties)
@@ -74,9 +74,9 @@ function _M:onLoading(version, agentType, properties)
             if StringUtils.isValidString(valueStr) then
                 local pParenthesis = string.find(valueStr, '%(')
                 if not pParenthesis then
-                    self.m_referencedBehavior = NodeParser.parseProperty(valueStr)
+                    self.m_referenced_behavior_p = NodeParser.parseProperty(valueStr)
                 else
-                    self.m_referencedBehavior = NodeParser.parseMethod(valueStr)
+                    self.m_referenced_behavior_p = NodeParser.parseMethod(valueStr)
                 end
 
                 self.m_referencedTreePath = self:getReferencedTree()
@@ -104,29 +104,15 @@ function _M:onLoading(version, agentType, properties)
     end
 end
 
-function _M:setTaskParams(agent)
+function _M:setTaskParams(agent, tick, subTreeTick)
     if self.m_taskPrototype then
-        self.m_taskPrototype:setTaskParams(agent)
+        self.m_taskPrototype:setTaskParams(agent, tick, subTreeTick)
     end
-end
-
---See: referencebehavior.cpp
---     Task* ReferencedBehavior::RootTaskNode(Agent* pAgent)
-function _M:rootTaskNode(agent)
-    if not self.m_taskPrototypeNode then
-        local bt = BehaviorTreeFactory.preloadBehaviorTree(self.m_referencedTreePath)
-
-        if bt and bt:getChildrenCount() == 1 then
-            self.m_taskPrototypeNode = bt:getChild(1)
-        end
-    end
-
-    return self.m_taskPrototypeNode
 end
 
 function _M:getReferencedTree()
-    _G.BEHAVIAC_ASSERT(self.m_referencedBehavior, "[_M:getReferencedTree()] m_referencedBehavior")
-    local treeName = self.m_referencedBehavior:getValue(agent)
+    _G.BEHAVIAC_ASSERT(self.m_referenced_behavior_p, "[_M:getReferencedTree()] m_referenced_behavior_p")
+    local treeName = self.m_referenced_behavior_p:getValue()
     _, treeName = StringUtils.trimEnclosedDoubleQuotes(treeName)
     return AgentMeta.getBehaviorTreePath(treeName)
  end
@@ -186,7 +172,7 @@ function _M:onEnter(agent, tick)
     if szTreePath and (not pSubBt or not StringUtils.compare(szTreePath, pSubBt:getRelativePath(), true)) then
         subTreeTick = agent:btCreateTreeTick(szTreePath)
         self:setSubTreeTick(tick, subTreeTick)
-        self:setTaskParams(agent)
+        self:setTaskParams(agent, tick, subTreeTick)
     elseif subTreeTick then
         subTreeTick:reset(pSubBt, agent)
     end

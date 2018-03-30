@@ -104,12 +104,11 @@ function _M:referencedTreePath()
     return m_referencedTreePath
 end
 
-function _M:switchTo(agent, tick, eventParams)
+function _M:switchTo(agent, eventParams)
     if not StringUtils.isNullOrEmpty(self.m_referencedTreePath) then
         if agent then
-            local tm = self:getTriggerMode()
-            agent:btEventTree(self.m_referencedTreePath, tm)
-            agent.m_blackboard:addLocalVariables(eventParams)
+            local subTreeTick = agent:btEventTree(self.m_referencedTreePath, self.m_triggerMode)
+            sbuTreeTick:addLocalVariables(eventParams)
             agent:btExec()
         end
     end
@@ -142,11 +141,9 @@ end
 function _M:update(agent, tick, childStatus)
     _G.BEHAVIAC_ASSERT(self:isEvent(), "[_M:update()] self:isEvent()")
 
-    if agent then
-        local referencedTreePath = self:getReferencedTreePath()
-        local triggerMode = self:getTriggerMode()
-        if referencedTreePath and triggerMode then
-            agent:btEventTree(referencedTreePath, triggerMode)
+    if not StringUtils.isNullOrEmpty(self.m_referencedTreePath) then
+        if agent then
+            agent:btEventTree(self.m_referencedTreePath, self.m_triggerMode)
             agent:btexec()
         end
     end

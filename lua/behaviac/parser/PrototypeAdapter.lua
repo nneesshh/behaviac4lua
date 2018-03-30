@@ -27,13 +27,13 @@ function _M:ctor()
     self.paramProperties  = {}
 end
 
-function _M:setTaskParams(agent)
+function _M:setTaskParams(agent, tick, subTreeTick)
     local params = {}
     for i, paramProp in ipairs(self.paramProperties) do
         local paramName = enums.BEHAVIAC_LOCAL_TASK_PARAM_PRE .. tostring(i - 1)
-        table.insert(params, { paramName, paramProp:getValue(agent) })
+        table.insert(params, { paramName, paramProp:getValue(agent, tick) })
     end
-    return agent.m_blackboard:addLocalVariables(params)
+    return subTreeTick:addLocalVariables(params)
 end
 
 function _M:buildTaskPrototype(prototypeName, paramStr)

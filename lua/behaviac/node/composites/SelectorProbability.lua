@@ -103,7 +103,7 @@ function _M:onEnter(agent, tick)
 
     for _, pChild in ipairs(self.m_children) do
         _G.BEHAVIAC_ASSERT(pChild:isDecoratorWeight(), "[_M:onEnter()] pChild:isDecoratorWeight")
-        local weight = pChild:getWeight(agent)
+        local weight = pChild:getWeightP()
         self:addWeightingMapWeight(tick, weight)
 
         totalSum = totalSum + weight
@@ -136,7 +136,7 @@ function _M:update(agent, tick, childStatus)
     _G.BEHAVIAC_ASSERT(#weightingMap == #self.m_children, "[_M:update()] #weightingMap == #self.m_children")
 
     -- generate a number between 0 and the sum of the weights
-    local chosen = self.m_totalSum * common.getRandomValue(self.m_randomGenerator, agent)
+    local chosen = self.m_totalSum * common.getRandomValue(self.m_randomGenerator, agent, tick)
     local sum = 0
 
     for i = 1, #self.m_children do

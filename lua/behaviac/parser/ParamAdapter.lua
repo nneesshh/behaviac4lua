@@ -49,47 +49,39 @@ function _M:ctor()
     self.paramProperties = {}
 end
 
-local function _unpackParams(agent, paramProperties)
+local function _unpackParams(agent, tick, paramProperties)
     local retValues = {}
     for _, paramProp in ipairs(paramProperties) do
-        table.insert(retValues, paramProp:getValue(agent))
+        table.insert(retValues, paramProp:getValue(agent, tick))
     end
     return unpack(retValues)
 end
 
-function _M:run(agent)
+function _M:run(agent, tick)
     if self.isMethod and self.valueIsFunction then
-        self.value(agent, _unpackParams(agent, self.paramProperties))
+        self.value(agent, tick, _unpackParams(agent, tick, self.paramProperties))
     end
 end
 
-function _M:setValueCast(agent, opr, cast)
+function _M:setValueCast(agent, tick, opr, cast)
     -- cast is unused
-    local r = opr:getValue(agent)
-    self.setValue(agent, r)
+    local result = opr:getValue(agent, tick)
+    self.setValue(agent, result)
 end
 
-function _M:getValue(agent)
-    if not self.valueIsFunction then
+function _M:getValue(agent, tick)
+    if not (self.isMethod or self.valueIsFunction) then
         return self.value
     end
-    if self.paramProperties then
-        return self.value(agent, _unpackParams(agent, self.paramProperties))
-    else
-        return self.value(agent)
-    end
+    return self.value(agent, tick, _unpackParams(agent, tick, self.paramProperties))
 end
 
-function _M:getValueFrom(agent, method)
-    local fp = method:getValue(agent)
-    if not self.valueIsFunction then
+function _M:getValueFrom(agent, tick, method)
+    local fp = method:getValue(agent, tick)
+    if not (self.isMethod or self.valueIsFunction) then
         return self.value
     end
-    if self.paramProperties then
-        return self.value(agent, fp, _unpackParams(agent, self.paramProperties))
-    else
-        return self.value(agent, fp)
-    end
+    return self.value(agent, tick, fp, _unpackParams(agent, tick, self.paramProperties))
 end
 
 local function _compute(left, right, computeType)
@@ -115,9 +107,9 @@ local function _compute(left, right, computeType)
 end
 
 -- Compute(pAgent, pComputeNode->m_opr1, pComputeNode->m_opr2, pComputeNode->m_operator)
-function _M:compute(agent, opr1, opr2, operator)
-    local r1 = opr1:getValue(agent)
-    local r2 = opr2:getValue(agent)
+function _M:compute(agent, tick, opr1, opr2, operator)
+    local r1 = opr1:getValue(agent, tick)
+    local r2 = opr2:getValue(agent, tick)
     if opr1.realTypeIsStruct or opr2.realTypeIsStruct then
         print("[_M:compute()] struct compute is not supported yet!!!", left, right)
         return
@@ -167,9 +159,9 @@ local function _compareStruct(left, right, operatorType)
     end
 end
 
-function _M:compare(agent, opr, operatorType)
-    local l = self:getValue(agent)
-    local r = opr:getValue(agent)
+function _M:compare(agent, tick, opr, operatorType)
+    local l = self:getValue(agent, tick)
+    local r = opr:getValue(agent, tick)
     if self.realTypeName == opr.realTypeName and (self.realTypeIsStruct or opr.realTypeIsStruct) then
         return _compareStruct(l, r, operatorType)
     else
@@ -292,12 +284,12 @@ function _M:buildProperty(propertyStr)
             local intanceName, className, propertyName = string.gmatch(propStr, "(.+)%.(.+)::(.+)")()
             if string.lower(intanceName) == "self" then
                 _G.BEHAVIAC_ASSERT(propertyName, "_M.parseProperty() property name can't be nil")
-                self.value = function(agent)
+                self.value = function(agent, tick)
                     local val = agent[propertyName]
                     if val then
                         return val
-                    else
-                        return agent.m_blackboard:getLocalVariable(propertyName)
+                    elseif tick then
+                        return tick:getLocalVariable(propertyName)
                     end
                 end
                 self.setValue = function(agent, value)

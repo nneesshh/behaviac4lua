@@ -182,7 +182,7 @@ function _M:execute(agent, tick)
     local status = EBTStatus.BT_RUNNING
 
     if self.m_method then
-        self.m_method:run(agent)
+        self.m_method:run(agent, tick)
     else
         status = self:evaluateImpl(agent, tick, EBTStatus.BT_RUNNING)
     end
