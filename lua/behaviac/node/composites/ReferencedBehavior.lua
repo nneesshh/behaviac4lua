@@ -172,10 +172,10 @@ function _M:onEnter(agent, tick)
     if szTreePath and (not pSubBt or not StringUtils.compare(szTreePath, pSubBt:getRelativePath(), true)) then
         subTreeTick = agent:btCreateTreeTick(szTreePath)
         self:setSubTreeTick(tick, subTreeTick)
-        self:setTaskParams(agent, tick, subTreeTick)
     elseif subTreeTick then
         subTreeTick:reset(pSubBt, agent)
     end
+    self:setTaskParams(agent, tick, subTreeTick)
     return true
 end
 

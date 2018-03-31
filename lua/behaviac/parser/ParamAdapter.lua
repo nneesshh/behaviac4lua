@@ -185,13 +185,13 @@ function _M:buildMethod(intanceName, className, methodName, paramStr)
     end
 
     if string.lower(intanceName) == "self" then
-        self.value = function(agent, ...)
+        self.value = function(agent, tick, ...)
             agent[methodName] = agent[methodName] or methodIsNotImplementedYetError
             return agent[methodName](agent, ...)
         end
         self.valueIsFunction = true
     else
-        self.value = function(agent, ...)
+        self.value = function(agent, tick, ...)
             local other = AgentMeta.getInstance(intanceName, className)
             local otherMethod = nil
             if nil ~= other then
