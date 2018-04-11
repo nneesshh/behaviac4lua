@@ -25,10 +25,10 @@ local Logging                   = common.d_log
 local StringUtils               = common.StringUtils
 
 -- Class
-local BaseNode = require(ppdir .. "core.BaseNode")
-local WithPrecondition = class("WithPrecondition", BaseNode)
+local Sequence = require(cwd .. "Sequence")
+local WithPrecondition = class("WithPrecondition", Sequence)
 _G.ADD_BEHAVIAC_DYNAMIC_TYPE("WithPrecondition", WithPrecondition)
-_G.BEHAVIAC_DECLARE_DYNAMIC_TYPE("WithPrecondition", "BaseNode")
+_G.BEHAVIAC_DECLARE_DYNAMIC_TYPE("WithPrecondition", "Sequence")
 local _M = WithPrecondition
 
 local NodeParser = require(ppdir .. "parser.NodeParser")

@@ -25,10 +25,10 @@ local Logging                   = common.d_log
 local StringUtils               = common.StringUtils
 
 -- Class
-local BaseNode = require(ppdir .. "core.BaseNode")
-local ReferencedBehavior = class("ReferencedBehavior", BaseNode)
+local SingleChild = require(ppdir .. "core.SingleChild")
+local ReferencedBehavior = class("ReferencedBehavior", SingleChild)
 _G.ADD_BEHAVIAC_DYNAMIC_TYPE("ReferencedBehavior", ReferencedBehavior)
-_G.BEHAVIAC_DECLARE_DYNAMIC_TYPE("ReferencedBehavior", "BaseNode")
+_G.BEHAVIAC_DECLARE_DYNAMIC_TYPE("ReferencedBehavior", "SingleChild")
 local _M = ReferencedBehavior
 
 local NodeParser = require(ppdir .. "parser.NodeParser")
