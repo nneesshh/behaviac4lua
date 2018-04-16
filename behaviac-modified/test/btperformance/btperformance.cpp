@@ -314,7 +314,8 @@ void btagenttick(behaviac::Workspace::EFileFormat format, int countAgents)
     printf("\nAgents %d Format %s\n", countAgents, strFormat);
     BEHAVIAC_LOGINFO("\nAgents %d Format %s\n", countAgents, strFormat);
 
-	behaviac::Workspace::GetInstance()->SetFilePath("../integration/unity_performance/Assets/Resources/behaviac/exported");
+	//behaviac::Workspace::GetInstance()->SetFilePath("../integration/unity_performance/Assets/Resources/behaviac/exported");
+	behaviac::Workspace::GetInstance()->SetFilePath("../test/btperformance/behaviac/exported");
 	behaviac::Workspace::GetInstance()->SetFileFormat(format);
 
     behaviac::Config::SetLogging(false);

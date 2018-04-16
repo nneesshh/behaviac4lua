@@ -1926,6 +1926,26 @@ namespace Behaviac.Design
                                 bEdit = true;
                             }
                         }
+
+                        // add by n.lee 2018-03-31
+                        if (this.memberTypeComboBox.SelectedIndex == (int)MemberType.Task)
+                        {
+                            Nodes.Behavior root = getCurrentRootNode() as Nodes.Behavior;
+                            AgentType agentType = root.AgentType;
+
+                            if (root.LocalVars != null && root.Children.Count > 0)
+                            {
+                                Nodes.BaseNode child = root.Children[0];
+                                if (child is Nodes.Task)
+                                {
+                                    Nodes.Task task = child as Nodes.Task;
+                                    List<ParInfo> pars = new List<ParInfo>();
+
+                                    task.CollectTaskPars(ref pars);
+                                    agentType.ResetPars(pars);
+                                }
+                            }
+                        }
                     }
 
                     if (bEdit)

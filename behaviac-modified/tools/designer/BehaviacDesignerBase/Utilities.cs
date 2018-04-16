@@ -230,10 +230,12 @@ namespace Behaviac.Design
                                 if ((bool)mo["IPEnabled"])
                                 {
                                     string[] gateways = (string[])mo["DefaultIPGateway"];
-
-                                    foreach (string gw in gateways)
+                                    if (null != gateways)
                                     {
-                                        _gatwway += gw;
+                                        foreach (string gw in gateways)
+                                        {
+                                            _gatwway += gw;
+                                        }
                                     }
 
                                     break;

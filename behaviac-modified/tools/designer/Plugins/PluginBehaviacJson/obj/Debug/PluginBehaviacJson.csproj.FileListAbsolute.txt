@@ -1,0 +1,9 @@
+D:\www\behaviac-master\tools\designer\Plugins\PluginBehaviacJson\obj\Debug\PluginBehaviacJson.Properties.Resources.resources
+D:\www\behaviac-master\tools\designer\Plugins\PluginBehaviacJson\obj\Debug\PluginBehaviacJson.csproj.GenerateResource.Cache
+D:\www\behaviac-master\tools\designer\Plugins\PluginBehaviacJson\obj\Debug\PluginBehaviacJson.csproj.CoreCompileInputs.cache
+D:\www\behaviac-master\tools\designer\out\PluginBehaviacJson.dll
+D:\www\behaviac-master\tools\designer\out\PluginBehaviacJson.pdb
+D:\www\behaviac-master\tools\designer\Plugins\PluginBehaviacJson\obj\Debug\PluginBehaviacJson.dll
+D:\www\behaviac-master\tools\designer\Plugins\PluginBehaviacJson\obj\Debug\PluginBehaviacJson.pdb
+D:\www\behaviac-master\tools\designer\Plugins\PluginBehaviacJson\obj\Debug\PluginBehaviacJson.csprojResolveAssemblyReference.cache
+D:\www\behaviac-master\tools\designer\Plugins\PluginBehaviacJson\obj\Debug\PluginBehaviacJson.csproj.CopyComplete
