@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<workspace name="tutorial_2_cs" metafilename="." folder="behaviors" export="..\cs\exported" language="cs" version="3">
+  <export>
+    <bson>
+      <isexported>True</isexported>
+    </bson>
+    <cs>
+      <isexported>True</isexported>
+      <exportfilecount>1</exportfilecount>
+      <folder>../../cs</folder>
+    </cs>
+  </export>
+</workspace>
