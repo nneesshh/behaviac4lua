@@ -47,3 +47,15 @@
 behaviac-modified/projects/gmake/
 
 behaviac-modified/projects/vs2010/
+
+*.idb
+
+*.tmp
+
+behaviac-modified/integration/demo_running/\.vs/
+
+behaviac-modified/integration/demo_running/obj/
+
+*.exp
+
+behaviac-modified/projects/vs2013/\.vs/
