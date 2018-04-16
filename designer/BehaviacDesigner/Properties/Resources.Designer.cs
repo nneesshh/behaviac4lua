@@ -19,7 +19,7 @@ namespace Behaviac.Design.Properties {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
@@ -1207,7 +1207,7 @@ namespace Behaviac.Design.Properties {
         /// <summary>
         ///   Looks up a localized string similar to The workspace file will be updated and the meta file will not be used any longer.
         ///You should export all files with the latest designer.
-        ///更多详情请参考：http://www.behaviac.com/updatenotes/#36x.
+        ///更多详情请参考：http://www.behaviac.com/language/zh/updatenotes/#36x.
         /// </summary>
         internal static string MetaWarning {
             get {

@@ -47,7 +47,7 @@ namespace PluginBehaviac.NodeExporters
 
         protected override bool ShouldGenerateClass(Node node)
         {
-            Action action = node as Action;
+            Nodes.Action action = node as Nodes.Action;
             return (action != null);
         }
 
@@ -55,7 +55,7 @@ namespace PluginBehaviac.NodeExporters
         {
             base.GenerateConstructor(node, stream, indent, className);
 
-            Action action = node as Action;
+            Nodes.Action action = node as Nodes.Action;
 
             if (action == null)
             {
@@ -74,7 +74,7 @@ namespace PluginBehaviac.NodeExporters
         {
             base.GenerateMember(node, stream, indent);
 
-            Action action = node as Action;
+            Nodes.Action action = node as Nodes.Action;
 
             if (action == null)
             {
@@ -91,7 +91,7 @@ namespace PluginBehaviac.NodeExporters
         {
             base.GenerateMethod(node, stream, indent);
 
-            Action action = node as Action;
+            Nodes.Action action = node as Nodes.Action;
 
             if (action == null)
             {

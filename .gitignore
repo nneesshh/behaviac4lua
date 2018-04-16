@@ -89,3 +89,21 @@ behaviac-modified/tools/designer/Plugins/PluginBehaviacJson/obj/
 behaviac-modified/tools/designer/Plugins/PluginBehaviacJson/Properties/
 
 behaviac-modified/tools/designer/External/DockPanel/WinFormsUI/Docking/
+
+designer/\.vs/
+
+designer/BehaviacDesigner/obj/
+
+designer/BehaviacDesignerBase/obj/
+
+designer/External/DockPanel/WinFormsUI/obj/
+
+designer/Plugins/PluginBehaviac/obj/
+
+designer/out/release/
+
+designer/BehaviacDesignerBase/Properties/
+
+designer/Plugins/PluginBehaviacJson/\.vs/
+
+designer/Plugins/PluginBehaviacJson/obj/

@@ -89,10 +89,10 @@ namespace Behaviac.Design
             {
                 int exporterIndex = i;
 
-                if (i == 2)
-                {
-                    exporterIndex = Plugin.GetExporterIndex(Workspace.Current.Language);
-                }
+                //if (i == 2)
+                //{
+                //    exporterIndex = Plugin.GetExporterIndex(Workspace.Current.Language);
+                //}
 
                 ExporterInfo info = Plugin.Exporters[exporterIndex];
 
@@ -124,10 +124,10 @@ namespace Behaviac.Design
                     }
                 }
 
-                if (i == 2)
-                {
-                    break;
-                }
+                //if (i == 2)
+                //{
+                //    break;
+                //}
             }
 
             changeExportFormat(exportIndex);
