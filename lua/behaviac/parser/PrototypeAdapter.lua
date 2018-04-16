@@ -33,6 +33,10 @@ function _M:setTaskParams(agent, tick, subTreeTick)
         local paramName = enums.BEHAVIAC_LOCAL_TASK_PARAM_PRE .. tostring(i - 1)
         table.insert(params, { paramName, paramProp:getValue(agent, tick) })
     end
+    if not subTreeTick then
+      print("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
+      assert(false)
+    end
     return subTreeTick:addLocalVariables(params)
 end
 

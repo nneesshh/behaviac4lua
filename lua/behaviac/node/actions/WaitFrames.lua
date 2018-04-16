@@ -70,9 +70,9 @@ function _M:onLoading(version, agentType, properties)
     end
 end
 
-function _M:getFramesP()
+function _M:getFramesP(agent, tick)
     if self.m_frames_p then
-        local frames = self.m_frames_p:getValue()
+        local frames = self.m_frames_p:getValue(agent, tick)
         if frames == 0xFFFFFFFF then
             return -1
         end
@@ -97,7 +97,7 @@ end
 
 function _M:onEnter(agent, tick)
     self:setStart(tick, common.getFrames())
-    self:setFrames(tick, self:getFramesP() or 0)
+    self:setFrames(tick, self:getFramesP(agent, tick) or 0)
 
     return self:getFrames() > 0
 end

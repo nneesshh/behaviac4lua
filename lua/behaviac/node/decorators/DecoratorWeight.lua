@@ -64,8 +64,8 @@ function _M:onLoading(version, agentType, properties)
     end
 end
 
-function _M:getWeightP()
-    return self.m_weight_p and self.m_weight_p:getValue() or 0
+function _M:getWeightP(agent, tick)
+    return self.m_weight_p and self.m_weight_p:getValue(agent, tick) or 0
 end
 
 function _M:isManagingChildrenAsSubTrees()

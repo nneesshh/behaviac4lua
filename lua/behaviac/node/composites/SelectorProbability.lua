@@ -103,7 +103,7 @@ function _M:onEnter(agent, tick)
 
     for _, pChild in ipairs(self.m_children) do
         _G.BEHAVIAC_ASSERT(pChild:isDecoratorWeight(), "[_M:onEnter()] pChild:isDecoratorWeight")
-        local weight = pChild:getWeightP()
+        local weight = pChild:getWeightP(agent, tick)
         self:addWeightingMapWeight(tick, weight)
 
         totalSum = totalSum + weight

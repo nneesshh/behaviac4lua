@@ -46,7 +46,8 @@ function _M:ctor()
     _M.super.ctor(self)
 
     self.m_referenced_behavior_p  = false
-    self.m_referencedTreePath     = ""
+    self.m_referencedTreePath     = false
+    self.m_bHasEvents             = false
 
     self.m_taskPrototype          = false
     self.m_transitions            = false
@@ -78,22 +79,6 @@ function _M:onLoading(version, agentType, properties)
                 else
                     self.m_referenced_behavior_p = NodeParser.parseMethod(valueStr)
                 end
-
-                self.m_referencedTreePath = self:getReferencedTree()
-
-                -- conservatively make it true
-                local bHasEvents = true
-
-                if not StringUtils.isNullOrEmpty(self.m_referencedTreePath) then
-                    local refBt = BehaviorTreeFactory.preloadBehaviorTree(self.m_referencedTreePath)
-
-                    _G.BEHAVIAC_ASSERT(refBt)
-                    if refBt then
-                        bHasEvents = refBt:hasEvents()
-                    end
-
-                    self.m_bHasEvents = self.m_bHasEvents or bHasEvents
-                end
             end
         elseif nameStr == "Task" then
             _G.BEHAVIAC_ASSERT(not StringUtils.isNullOrEmpty(valueStr))
@@ -110,11 +95,29 @@ function _M:setTaskParams(agent, tick, subTreeTick)
     end
 end
 
-function _M:getReferencedTree()
-    _G.BEHAVIAC_ASSERT(self.m_referenced_behavior_p, "[_M:getReferencedTree()] m_referenced_behavior_p")
-    local treeName = self.m_referenced_behavior_p:getValue()
-    _, treeName = StringUtils.trimEnclosedDoubleQuotes(treeName)
-    return AgentMeta.getBehaviorTreePath(treeName)
+function _M:getReferencedTreePath(agent, tick)
+    _G.BEHAVIAC_ASSERT(self.m_referenced_behavior_p, "[_M:getReferencedTreePath()] m_referenced_behavior_p")
+
+    if not self.m_referencedTreePath then
+        local name = self.m_referenced_behavior_p:getValue(agent, tick)
+        local _, name2 = StringUtils.trimEnclosedDoubleQuotes(name)
+        self.m_referencedTreePath = AgentMeta.getBehaviorTreePath(name2)
+
+        -- conservatively make it true
+        local bHasEvents = true
+
+        if not StringUtils.isNullOrEmpty(self.m_referencedTreePath) then
+            local refBt = BehaviorTreeFactory.preloadBehaviorTree(self.m_referencedTreePath)
+
+            _G.BEHAVIAC_ASSERT(refBt)
+            if refBt then
+                bHasEvents = refBt:hasEvents()
+            end
+
+            self.m_bHasEvents = self.m_bHasEvents or bHasEvents
+        end
+    end
+    return self.m_referencedTreePath
  end
 
 function _M:attach(pAttachment, isPrecondition, isEffector, isTransition)
@@ -164,7 +167,7 @@ end
 function _M:onEnter(agent, tick)
     _G.BEHAVIAC_ASSERT(self:isReferencedBehavior(), "[_M:onEnter()] self:isReferencedBehavior")
     self:setNextStateId(tick, -1)
-    local szTreePath = self:getReferencedTree(tick)
+    local szTreePath = self:getReferencedTreePath(agent, tick)
     
     -- to create the task on demand
     local subTreeTick = self:getSubTreeTick(tick)

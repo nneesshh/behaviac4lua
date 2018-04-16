@@ -72,8 +72,8 @@ function _M:onLoading(version, agentType, properties)
     end
 end
 
-function _M:getTimeP()
-    return self.m_time_p and self.m_time_p:getValue() or 0
+function _M:getTimeP(agent, tick)
+    return self.m_time_p and self.m_time_p:getValue(agent, tick) or 0
 end
 
 --------------------------------------------------------------------------------
@@ -87,7 +87,7 @@ end
 
 function _M:onEnter(agent, tick)
     self:setStart(tick, common.getClock())
-    self:setTime(tick, self:getTimeP() or 0)
+    self:setTime(tick, self:getTimeP(agent, tick) or 0)
     return self:getTime(tick) > 0 
 end
 

@@ -62,7 +62,7 @@ function _M:onEnter(agent, tick)
     -- don't reset the m_n if it is restarted
     local num = self:getNum(tick)
     if num == 0 then
-        local countP = self:getCountP()
+        local countP = self:getCountP(agent, tick)
         if countP == 0 then
             return false
         end

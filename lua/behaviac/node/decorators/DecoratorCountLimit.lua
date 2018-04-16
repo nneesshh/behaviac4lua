@@ -77,7 +77,7 @@ function _M:onEnter(agent, tick)
     local bInitialized = self:getInitialized(tick)
     if not bInitialized then
         self:setInitialized(tick, true)
-        local countP = self:getCountP()
+        local countP = self:getCountP(agent, tick)
         self:setNum(tick, countP)
     end
 
