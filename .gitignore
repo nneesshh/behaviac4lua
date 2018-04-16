@@ -43,3 +43,7 @@
 *.opendb
 /build/.vs/redisservice/v15/ipch/AutoPCH/1d800acded623c9b/REDISSERVICE.ipch
 /build/.vs/redisservice/v15/ipch/AutoPCH/402942203bad331b/KJREDISCLIENTCONN.ipch
+
+behaviac-modified/projects/gmake/
+
+behaviac-modified/projects/vs2010/
