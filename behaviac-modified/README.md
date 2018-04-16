@@ -1,1 +1,0 @@
-Modified because lua implementation doesn't use meta data

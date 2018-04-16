@@ -1,8 +1,0 @@
-D:\www\out\behaviacPlugin.dll
-D:\www\out\behaviacPlugin.pdb
-D:\www\behaviac-lua-master\behaviacPluginSrc\obj\Debug\behaviacPlugin.csprojResolveAssemblyReference.cache
-D:\www\behaviac-lua-master\behaviacPluginSrc\obj\Debug\behaviacPlugin.Properties.Resources.resources
-D:\www\behaviac-lua-master\behaviacPluginSrc\obj\Debug\behaviacPlugin.csproj.GenerateResource.Cache
-D:\www\behaviac-lua-master\behaviacPluginSrc\obj\Debug\behaviacPlugin.csproj.CoreCompileInputs.cache
-D:\www\behaviac-lua-master\behaviacPluginSrc\obj\Debug\behaviacPlugin.dll
-D:\www\behaviac-lua-master\behaviacPluginSrc\obj\Debug\behaviacPlugin.pdb
