@@ -1,4 +1,4 @@
-*.css linguist-language=Lua
+*.cs linguist-language=Lua
 *.py linguist-language=Lua
 *.js linguist-language=Lua
 *.css linguist-language=Lua
