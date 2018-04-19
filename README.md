@@ -8,6 +8,7 @@ behaviac for lua with blackboard, tick and json
 - Add json plugin to help debug
 - Enum is not fullly supported yet
 - Bson format is prefered, then the json format, does not support other formats
+- Set debugger.lua "enable_debugger = true" to enable debugger
 
 ## Special Thanks
 
