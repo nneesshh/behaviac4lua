@@ -51,17 +51,17 @@ end
 
 function _M.StringUtils.trimEnclosedDoubleQuotes(str)
     if string.byte(str, 1, 1) == constCharByte.DoubleQuote and string.byte(str, -1, -1) == constCharByte.DoubleQuote then
-        return true, string.sub(str, 2, -2)
+        return string.sub(str, 2, -2), true
     else
-        return false, str
+        return str, false
     end
 end
 
 function _M.StringUtils.trimEnclosedBrackets(str)
     if string.byte(str, 1, 1) == constCharByte.LeftBraces and string.byte(str, -1, -1) == constCharByte.RightBraces then
-        return true, string.sub(str, 2, -2)
+        return string.sub(str, 2, -2), true
     else
-        return false, str
+        return str, false
     end
 end
 

@@ -1,4 +1,7 @@
 
+package.path = package.path .. ";./lua/?.lua;./lua/?/init.lua;./lua/protobuf/?.lua;./lua/proto_pb/?.lua"
+package.cpath = package.cpath .. ";./?.dll;./clibs/?.dll"
+
 local b = require "behaviac"
 --local p = require "presstest"
 --local msg_dispatcher = require ("presstest.MessageDispatcher")
@@ -10,10 +13,8 @@ local BehaviorTreeFactory = b.BehaviorTreeFactory
 local MyRobotClass = class("Robot", b.BaseAgent)
 
 function MyRobotClass:ctor(unit)
-    dump(unit, "unit")
     MyRobotClass.super.ctor(self)
     self.unit = unit
-
     self.count = 0
 end
 
@@ -89,6 +90,22 @@ function MyRobotClass:GetP1s1()
     return tonumber(self.p1.s1)
 end
 
+function MyRobotClass:Start(a, b, c)
+    self.count = 0
+end
+
+function MyRobotClass:Wait()
+    self.count = self.count + 1
+
+	print("p1 =", p1)
+
+	if self.count == 10000 then
+		return EBTStatus.BT_SUCCESS
+    end
+
+	return EBTStatus.BT_RUNNING
+end
+
 assert(nil == _M)
 ----------------------------------------------------------------
 local myRobot = MyRobotClass.new()
@@ -111,20 +128,27 @@ local path_EnumBT = AgentMeta.getBehaviorTreePath("EnumBT.bson.bytes")
 local path_islandBattle = AgentMeta.getBehaviorTreePath("islandBattle")
 local path_task = AgentMeta.getBehaviorTreePath("task")
 
+local path_demo = AgentMeta.getBehaviorTreePath("demo")
+
 -- force load
-BehaviorTreeFactory.loadBehaviorTree(path_task .. ".json")
+BehaviorTreeFactory.loadBehaviorTree(path_demo .. ".json")
 
 AgentMeta.registerEnumType("FirstEnum", { e1 = 0, e2 = 1 })
 --myRobot:btSetCurrent(path_islandBattle)
-myRobot:btSetCurrent(path_maintree_task)
+myRobot:btSetCurrent(path_demo)
 
 local loopCount = 3
-for i= 1, loopCount do
-    print('-----------------------start-----------------------', i)
+--for i= 1, loopCount do
+local frame = 1
+while true do
+
+    print('-----------------------start-----------------------', frame)
     myRobot:btExec()
-    print('end', '----------------------------------------------', i)
+    print('end', '----------------------------------------------', frame)
+
+    frame = frame + 1
 end
 
 print('---- ---- fire event... ---- ----')
-myRobot:fireEvent("event_task", 2)
+--myRobot:fireEvent("event_task", 2)
 --myRobot:btExec()

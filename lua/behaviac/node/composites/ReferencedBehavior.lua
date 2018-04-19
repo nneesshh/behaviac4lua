@@ -95,13 +95,16 @@ function _M:setTaskParams(agent, tick, subTreeTick)
     end
 end
 
-function _M:getReferencedTreePath(agent, tick)
-    _G.BEHAVIAC_ASSERT(self.m_referenced_behavior_p, "[_M:getReferencedTreePath()] m_referenced_behavior_p")
+function _M:getReferencedTreeName(agent, tick)
+    _G.BEHAVIAC_ASSERT(self.m_referenced_behavior_p, "[_M:getReferencedTreeName()] m_referenced_behavior_p")
+    local name = self.m_referenced_behavior_p:getValue(agent, tick)
+    return StringUtils.trimEnclosedDoubleQuotes(name)
+end
 
+function _M:getReferencedTreePath(agent, tick)
     if not self.m_referencedTreePath then
-        local name = self.m_referenced_behavior_p:getValue(agent, tick)
-        local _, name2 = StringUtils.trimEnclosedDoubleQuotes(name)
-        self.m_referencedTreePath = AgentMeta.getBehaviorTreePath(name2)
+        local name, _ = _M.getReferencedTreeName(agent, tick)
+        self.m_referencedTreePath = AgentMeta.getBehaviorTreePath(name)
 
         -- conservatively make it true
         local bHasEvents = true

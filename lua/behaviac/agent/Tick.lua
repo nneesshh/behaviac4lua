@@ -33,6 +33,8 @@ local _M = Tick
 
 local Blackboard = require(cwd .. "Blackboard")
 
+local debugger = require(pdir .. "debugger")
+
 --------------------------------------------------------------------------------
 -- Initialize
 --------------------------------------------------------------------------------
@@ -56,18 +58,47 @@ function _M:exec(targetNode, agent)
     return self:execWithChildStatus(targetNode, agent, childStatus)
 end
 
--- See behaviortree_task.cpp
---     EBTStatus exec(Agent* pAgent, EBTStatus childStatus)
-function _M:execWithChildStatus(targetNode, agent, childStatus)
-    local status = targetNode:getStatus(self)
-    
+-- for debugger
+local function _testEnterNodeDebug(tick, node, agent, status)
     local bEnterResult = false
     if status == EBTStatus.BT_RUNNING then
         bEnterResult = true
     else
         status = EBTStatus.BT_INVALID
-        bEnterResult = self:onEnterAction(targetNode, agent)
+        bEnterResult = tick:onEnterAction(node, agent)
     end
+
+    if bEnterResult then
+        debugger.lib.logUpdate(agent, node)
+    end
+    return bEnterResult, status
+end
+
+local function _testEnterNode(tick, node, agent, status)
+    local bEnterResult = false
+    if status == EBTStatus.BT_RUNNING then
+        bEnterResult = true
+    else
+        status = EBTStatus.BT_INVALID
+        bEnterResult = tick:onEnterAction(node, agent)
+    end
+    return bEnterResult, status
+end
+
+-- impl: [ _testEnterNodeImpl ]
+local _testEnterNodeImpl
+if debugger.enable_debugger then
+    _testEnterNodeImpl = _testEnterNodeDebug
+else
+    _testEnterNodeImpl = _testEnterNode
+end
+
+-- See behaviortree_task.cpp
+--     EBTStatus exec(Agent* pAgent, EBTStatus childStatus)
+function _M:execWithChildStatus(targetNode, agent, childStatus)
+    local status = targetNode:getStatus(self)
+    
+    local bEnterResult = _testEnterNodeImpl(self, targetNode, agent, status)
 
     if bEnterResult then
         local bValid = self:checkParentUpdatePreconditions(targetNode, agent)
@@ -164,33 +195,74 @@ function _M:getTopManageBranchNode(targetNode)
     return node
 end
 
-function _M:onEnterAction(targetNode, agent)
-    local bResult = targetNode:checkPreconditions(agent, self, false)
-    if bResult then
-        targetNode:setHasManagingParent(self, false)
-        targetNode:setCurrentVisitingNode(self, false)
-        bResult = targetNode:onEnter(agent, self)
-        if not bResult then
-            return false
-        else
-            -- do nothing
+-- for debugger
+local function _onEnterActionDebug(tick, targetNode, agent)
+    local bResult = targetNode:checkPreconditions(agent, tick, false)
+    if not bResult then
+        return false
+    else
+        targetNode:setHasManagingParent(tick, false)
+        targetNode:setCurrentVisitingNode(tick, false)
+        bResult = targetNode:onEnter(agent, tick)
+        if bResult then
+            debugger.lib.CHECK_BREAKPOINT(agent, targetNode, "enter", bResult)
         end
     end
 
     return bResult
 end
 
-function _M:onExitAction(targetNode, agent, status)
-    targetNode:onExit(agent, self, status)
+local function _onEnterAction(tick, targetNode, agent)
+    local bResult = targetNode:checkPreconditions(agent, tick, false)
+    if not bResult then
+        return false
+    else
+        targetNode:setHasManagingParent(tick, false)
+        targetNode:setCurrentVisitingNode(tick, false)
+        return targetNode:onEnter(agent, tick)
+    end
+end
+
+-- for debugger
+local function _onExitActionDebug(tick, targetNode, agent, status)
+    targetNode:onExit(agent, tick, status)
 
     local phase = ENodePhase.E_SUCCESS
 
     if status == EBTStatus.BT_FAILURE then
         phase = ENodePhase.E_FAILURE
     else
-        _G.BEHAVIAC_ASSERT(status == EBTStatus.BT_SUCCESS, string.format("[onExitAction] status (%d) must be EBTStatus.BT_SUCCESS", status))
+        _G.BEHAVIAC_ASSERT(status == EBTStatus.BT_SUCCESS, string.format("[onExitAction] status (%d) must be EBTStatus.BT_SUCCESS or EBTStatus.BT_FAILURE", status))
     end
-    targetNode:applyEffects(agent, self, phase)
+    targetNode:applyEffects(agent, tick, phase)
+
+    if status == EBTStatus.BT_SUCCESS then
+        debugger.lib.CHECK_BREAKPOINT(agent, targetNode, "exit", true)
+    else
+        debugger.lib.CHECK_BREAKPOINT(agent, targetNode, "exit", false)
+    end
+end
+
+local function _onExitAction(tick, targetNode, agent, status)
+    targetNode:onExit(agent, tick, status)
+
+    local phase = ENodePhase.E_SUCCESS
+
+    if status == EBTStatus.BT_FAILURE then
+        phase = ENodePhase.E_FAILURE
+    else
+        _G.BEHAVIAC_ASSERT(status == EBTStatus.BT_SUCCESS, string.format("[onExitAction] status (%d) must be EBTStatus.BT_SUCCESS or EBTStatus.BT_FAILURE", status))
+    end
+    targetNode:applyEffects(agent, tick, phase)
+end
+
+-- impl: [ onEnterAction, onExitAction ]
+if debugger.enable_debugger then
+    _M.onEnterAction = _onEnterActionDebug
+    _M.onExitAction = _onExitActionDebug
+else
+    _M.onEnterAction = _onEnterAction
+    _M.onExitAction = _onExitAction
 end
 
 local function _getRunningNodesHandler(node, agent, tick, retNodes)

@@ -39,6 +39,8 @@ local AgentMeta = require(pdir .. "agent.AgentMeta")
 local bson = require(pdir .. "external.bson")
 local BsonNodeLoader = require(pdir .. "parser.BsonNodeLoader")
 
+local debugger = require(pdir .. "debugger")
+
 --------------------------------------------------------------------------------
 -- Initialize
 --------------------------------------------------------------------------------
@@ -124,7 +126,7 @@ function _M:loadBson(bsonTreeData, behaviorTreePath)
     self:setName(name)
     self:setRelativePath(behaviorTreePath)
     self:setClassNameString("BehaviorTree")
-    self:setId(0xffffffff)
+    self:setId(-1)
 
     self.m_bIsFSM = bFsm
 
@@ -150,7 +152,7 @@ function _M:load(treeData, behaviorTreePath)
     self:setName(name)
     self:setRelativePath(behaviorTreePath)
     self:setClassNameString("BehaviorTree")
-    self:setId(0xffffffff)
+    self:setId(-1)
 
     if behaviorEntry["fsm"] == "true" then
         self.m_bIsFSM = true
@@ -179,25 +181,42 @@ function _M:init(tick)
     self:instantiatePars(tick)
 end
 
-function _M:onEnter(agent, tick)
+-- for debugger
+local function _onEnterDebug(node, agent, tick)
+    debugger.lib.logJumpTree(agent, node:getName())
     return true
 end
 
-function _M:onExit(agent, tick, status)
-    return _M.super.onExit(self, agent, status)
+local function _onEnter(node, agent, tick)
+    return true
+end
+
+-- for debugger
+local function _onExitDebug(node, agent, tick, status)
+    debugger.lib.logReturnTree(agent, node:getName())
+    return _M.super.onExit(node, agent, status)
+end
+
+local function _onExit(node, agent, tick, status)
+    return _M.super.onExit(node, agent, status)
+end
+
+-- impl: [ onEnter, onExit ]
+if debugger.enable_debugger then
+    _M.onEnter = _onEnterDebug
+    _M.onExit = _onExitDebug
+else
+    _M.onEnter = _onEnter
+    _M.onExit = _onExit
 end
 
 function _M:updateCurrent(agent, tick, childStatus)
     _G.BEHAVIAC_ASSERT(self:isBehaviorTree(), "[_M:updateCurrent()] isBehaviorTree failed")
-
-    local status = EBTStatus.BT_RUNNING
     if self:isFSM() then
-        status = self:update(agent, tick, childStatus)
+        return self:update(agent, tick, childStatus)
     else
-        status = _M.super.updateCurrent(self, agent, tick, childStatus)
+        return _M.super.updateCurrent(self, agent, tick, childStatus)
     end
-
-    return status
 end
 
 function _M:update(agent, tick, childStatus)

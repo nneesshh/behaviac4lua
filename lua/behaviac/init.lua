@@ -5,11 +5,11 @@
 -- @license MIT/X11
 
 local lib_behaviac = {
-	_LICENSE     = "MIT/X11",
-	_URL         = "http://",
-	_VERSION     = "1.0.0.1",
-	_DESCRIPTION = "Behaviac Lib...",
-	cache        = {},
+	_LICENSE      = "MIT/X11",
+	_URL          = "http://",
+	_VERSION      = "1.0.0.1",
+	_DESCRIPTION  = "Behaviac Lib...",
+
 }
 
 -- Localize
@@ -17,6 +17,7 @@ local cwd = (...):gsub('%.[^%.]+$', '') .. "."
 
 require("utils.functions")
 require(cwd .. "macros")
+require(cwd .. "debugger")
 
 -- Module
 local _M = lib_behaviac

@@ -35,39 +35,109 @@ local Tick = require(cwd .. "Tick")
 
 local BehaviorTreeFactory = require(pdir .. "parser.BehaviorTreeFactory")
 
+local debugger = require(pdir .. "debugger")
+
 --------------------------------------------------------------------------------
 -- Initialize
 --------------------------------------------------------------------------------
 
+-- static 
+_M.s_agent_index = 0 -- next id index
+_M.s_agent_type_index = {} -- full type name 2 next type id index
+
 -- ctor
 function _M:ctor()
-    self.m_priority               = 0
-    self.m_bActive                = true
-    self.m_name                   = ""
-    self.m_blackboard             = Blackboard.new(self)
+    self.m_id                 = -1 -- //m_id == -1, not a valid agent
+    self.m_priority           = 0
+    self.m_bActive            = true
+    self.m_name               = "FirstAgent_0_0" -- instance name
+    self.m_objectTypeName     = "FirstAgent" -- agent type
+    self.m_blackboard         = Blackboard.new(self)
 
-    self.m_ttStack                = {}
-    self.m_currentTreeTick        = false
-    self.m_behaviorTreeTicks      = {}
+    self.m_ttStack            = {}
+    self.m_currentTreeTick    = false
+    self.m_behaviorTreeTicks  = {}
 
-    self.m_referencetree          = false
+    self.m_referencetree      = false
+end
+
+function _M:init(agentType, instanceName)
+    if self.m_id < 0 and #agentType > 0 then
+        -- id ++
+        self.m_id = _M.s_agent_index
+        _M.s_agent_index = _M.s_agent_index + 1
+
+        -- agent type
+        self.m_objectTypeName = agentType
+
+        -- instance name
+        if not instanceName then
+            local typeId = 0
+            local typeFullName = self:getObjectTypeName()
+            local typeName = typeFullName
+
+            -- reverse find
+            local pos_b, _ = string.find(typeFullName, ':[^:]*$')
+            if pos_b then
+                typeName = string.sub(typeFullName, pos_b + 1)
+            end
+
+            local next_index = _M.s_agent_type_index[typeFullName]
+            if not next_index then
+                typeId = 0
+                _M.s_agent_type_index[typeFullName] = 1
+            else
+                typeId = _M.s_agent_type_index[typeFullName]
+                _M.s_agent_type_index[typeFullName] = typeId + 1
+            end
+
+            self.m_name = string.format("%s_%d_%d", typeName, typeId, self.m_id)
+        else
+            self.m_name = instanceName
+        end
+    end
 end
 
 function _M:release()
-    self.m_blackboard             = false
+    self.m_blackboard = false
 end
 
--- 
-function _M:btExec()
-    if self.m_bActive then
-        local s = self:btExec_()
-        while self.m_referencetree and s == EBTStatus.BT_RUNNING do
-            self.m_referencetree = false
-            s = self:btExec_()
+-- for debugger
+local function _btExecDebug(agent)
+    -- debugger update
+    debugger.lib.tryRestartDebugger()
+    debugger.lib.logFrames()
+    debugger.lib.handleRequests()
+
+    --
+    if agent.m_bActive then
+        local s = agent:btExec_()
+        while agent.m_referencetree and s == EBTStatus.BT_RUNNING do
+            agent.m_referencetree = false
+            s = agent:btExec_()
         end
         return s
     end
     return EBTStatus.BT_INVALID
+end
+
+local function _btExec(agent)
+    if agent.m_bActive then
+        local s = agent:btExec_()
+        while agent.m_referencetree and s == EBTStatus.BT_RUNNING do
+            agent.m_referencetree = false
+            s = agent:btExec_()
+        end
+        return s
+    end
+    return EBTStatus.BT_INVALID
+end
+
+-- impl: [ btExec ]
+if debugger.enable_debugger then
+    _M.btExec = _btExecDebug
+else
+    _M.btExec = _btExec
 end
 
 --
@@ -181,6 +251,7 @@ function _M:_btSetCurrent(relativeTreePath, triggerMode, byEvent)
 
     -- set current
     self.m_currentTreeTick = pTick
+    self:init(pTick:getBt():getAgentType())
     return pTick
 end
 
@@ -224,8 +295,12 @@ function _M:fireEvent(eventName, ...)
     self:btOnEvent(eventName, eventParams)
 end
 
+function _M:getInstanceName()
+    return self.m_name
+end
+
 function _M:getObjectTypeName()
-    return self[constBaseKeyStrDef.kStrClass].__cname
+    return self.m_objectTypeName
 end
 
 function _M:isActive()

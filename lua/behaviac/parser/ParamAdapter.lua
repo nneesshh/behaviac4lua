@@ -216,7 +216,7 @@ function _M:buildProperty(propertyStr)
         local typeName = "string"
         local valueNum
 
-        local bQuote, valueStr = StringUtils.trimEnclosedDoubleQuotes(propertyStr)
+        local valueStr, bQuote = StringUtils.trimEnclosedDoubleQuotes(propertyStr)
         if not bQuote then
             valueNum = tonumber(valueStr)
             typeName = valueNum and "number"
@@ -285,10 +285,10 @@ function _M:buildProperty(propertyStr)
             if string.lower(intanceName) == "self" then
                 _G.BEHAVIAC_ASSERT(propertyName, "_M.parseProperty() property name can't be nil")
                 self.value = function(agent, tick)
-                    if not agent then 
+                    --[[if not agent then 
                         print("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
                         assert(false)
-                    end
+                    end]]
                     local val = agent[propertyName]
                     if val then
                         return val
