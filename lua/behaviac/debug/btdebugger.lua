@@ -161,8 +161,8 @@ local function _sendText(text)
     local _, err = peer:send(bytes)
     if err == 'closed' then
       _reset()
-    else
-      print("send over, ", err)
+    --else
+    --  print("send text -- ", text)
     end
   end
 end
