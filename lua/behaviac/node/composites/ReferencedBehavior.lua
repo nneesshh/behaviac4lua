@@ -103,7 +103,7 @@ end
 
 function _M:getReferencedTreePath(agent, tick)
     if not self.m_referencedTreePath then
-        local name, _ = _M.getReferencedTreeName(agent, tick)
+        local name, _ = _M.getReferencedTreeName(self, agent, tick)
         self.m_referencedTreePath = AgentMeta.getBehaviorTreePath(name)
 
         -- conservatively make it true
