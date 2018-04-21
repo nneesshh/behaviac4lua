@@ -35,16 +35,20 @@ end
 
 function _M.getInstance(intanceName, className)
     local instance = _M._agentInstances[intanceName]
-    if nil == instance then
+    if not instance and className then
         local meta = _M.getMeta(className)
-        if nil ~= meta then
+        if meta then
             instance = meta.new()
-            _M. _agentInstances[intanceName] = instance
+            _M.registerInstance(instanceName, instance)
         else
             print(intanceName .. "." .. className .. " error: meta not found!!!")
         end
     end
     return instance
+end
+
+function _M.getAgent(agentName)
+    return _M.getInstance(agentName)
 end
 
 function _M.registerEnumType(enumTypeName, enumType)

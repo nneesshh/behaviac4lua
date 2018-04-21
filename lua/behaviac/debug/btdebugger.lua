@@ -5,6 +5,7 @@ local table = table or require "table"
 local string = string or require "string"
 local unpack = table.unpack or unpack
 
+local pdir = (...):gsub('%.[^%.]+%.[^%.]+$', '') .. "."
 local cwd = (...):gsub('%.[^%.]+$', '') .. "."
 local socket = require(cwd .. "socket.socket")
 local lpack = require("lpack")
@@ -183,7 +184,7 @@ end
 --void LogManager::Log(const behaviac::Agent* pAgent, const char* btMsg, behaviac::EActionResult actionResult, behaviac::LogMode mode) {
 local function _sendBtMsg(agent, btMsg, actionResult, mode)
   if btMsg then
-    local agentName = agent:getObjectTypeName() .. "#" ..agent:getInstanceName()
+    local agentName = agent:getAgentName()
     local actionResultStr = ""
 
     if actionResult == constEActionResult.EAR_success then
@@ -485,12 +486,13 @@ end
 --//[property] WorldState::WorldState int WorldState::time->185606213
 --//--[property] Ship::Ship_2_3 long GameObject::age->91291
 --//[property] Ship::Ship_2_3 bool par_a->true
+--void Workspace::ParseProperty(const behaviac::vector<behaviac::string>& tokens)
 local function _parseProperty(tokens)
   local agentName = tokens[2]
   local pos_b, pos_e
   local size = 0
 
-  --[[
+  local AgentMeta = require(pdir .. "agent.AgentMeta")
   local agent = AgentMeta.getAgent(agentName)
 
   --//agent could be 0
@@ -501,18 +503,24 @@ local function _parseProperty(tokens)
     if pos_b then
       --//varNameValue is the last one with '\n'
       local pos_e = varNameValue:find('\n', 1, true)
-      if pos_e then
-        size = pos_e - pos_b - 1
+      if not pos_e then
+        pos_e = #varNameValue
       end
 
-      local varName = varNameValue:sub(1, pos_b + 1)
-      local varValue = varNameValue:substr(pos_b + 3, size)
+      local varName = varNameValue:sub(1, pos_b - 1)
+      local varValue = varNameValue:sub(pos_b + 2, pos_e)
 
-      --if agent then
-        --agent->SetVariableFromString(varName, varValue)
-      --end
+      local prop = agent[varName]
+      if not prop then
+        local ParamAdapter = require(pdir .. "parser.ParamAdapter")
+        prop = ParamAdapter.new()
+      end
+
+      --
+      prop:buildProperty(varValue)
+      agent[varName] = prop
     end
-  end]]
+  end
 end
 
 function _M.handleRequests()
@@ -669,7 +677,7 @@ function _M.CHECK_BREAKPOINT(agent, node, action, result)
 
     if _checkBreakpoint(agent, node, action, actionResult) then
       --//log the current variables, otherwise, its value is not the latest
-      --pAgent->LogVariables(false);
+      _M.logVariables(agent)
       _sendBtMsg(agent, bpstr, actionResult, constLogMode.ELM_breaked);
       --LogManager::GetInstance()->Flush(pAgent);
       --behaviac::Socket::Flush();
@@ -748,6 +756,51 @@ function _M.logUpdate(agent, node)
     -- //empty btStr is for internal BehaviorTreeTask
     if type(btStr) == 'string' and #btStr > 0 then
       _sendBtMsg(agent, btStr, constEActionResult.EAR_none, constLogMode.ELM_tick)
+    end
+  end
+end
+
+-- void LogManager::Log(const behaviac::Agent* pAgent, const char* typeName, const char* varName, const char* value)
+function _logProperty(agent, varName, varValue)
+  local agentName = agent:getAgentName()
+
+  --//[property]WorldState::World WorldState::time->276854364
+  --//[property]Ship::Ship_1 GameObject::HP->100
+  --//[property]Ship::Ship_1 GameObject::age->0
+  --//[property]Ship::Ship_1 GameObject::speed->0.000000
+  local buffer = string.format("[property]%s %s->%s\n", agentName, varName, varValue);
+
+  --[[
+      if (bOutput) {
+          this->Output(pAgent, buffer);
+      }
+  ]]
+
+  _sendText(buffer)
+end
+
+--/**
+--   log changed variables(propery and par)
+--*/
+-- void LogVariables(bool bForce);
+function _M.logVariables(agent)
+  --this->GetVariables()->Log(this, bForce);
+
+  --//local var
+  if agent.m_currentTreeTick then
+    local localVars = agent.m_currentTreeTick.m_localVars
+    for k, v in pairs(localVars) do
+      _logProperty(agent, tostring(k), tostring(v))
+    end
+  end
+
+  --//customized property
+  --this->m_variables->Log(this, false);
+
+  -- //member property
+  for k, v in pairs(agent) do
+   if type(k) == 'string' then
+    _logProperty(agent, tostring(k), tostring(v))
     end
   end
 end

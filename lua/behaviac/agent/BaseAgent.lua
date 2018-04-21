@@ -52,6 +52,7 @@ function _M:ctor()
     self.m_bActive            = true
     self.m_name               = "FirstAgent_0_0" -- instance name
     self.m_objectTypeName     = "FirstAgent" -- agent type
+    self.m_agentName          = "FirstAgent#FirstAgent_0_0" -- agent type + instance name
     self.m_blackboard         = Blackboard.new(self)
 
     self.m_ttStack            = {}
@@ -95,6 +96,10 @@ function _M:init(agentType, instanceName)
         else
             self.m_name = instanceName
         end
+
+        -- update instance pool by agent name
+        self.m_agentName = self:getObjectTypeName() .. "#" .. self:getInstanceName()
+        AgentMeta.registerInstance(self.m_agentName, self)
     end
 end
 
@@ -142,7 +147,7 @@ end
 
 --
 function _M:btExec_()
-    if self.m_currentTreeTick ~= nil then
+    if self.m_currentTreeTick then
         local pLast = self.m_currentTreeTick
         local pBt = self.m_currentTreeTick:getBt()
         local s = self.m_currentTreeTick:exec(pBt, self)
@@ -301,6 +306,10 @@ end
 
 function _M:getObjectTypeName()
     return self.m_objectTypeName
+end
+
+function _M:getAgentName()
+    return self.m_agentName
 end
 
 function _M:isActive()

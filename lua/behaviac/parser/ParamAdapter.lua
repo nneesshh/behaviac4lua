@@ -286,7 +286,7 @@ function _M:buildProperty(propertyStr)
                 _G.BEHAVIAC_ASSERT(propertyName, "_M.parseProperty() property name can't be nil")
                 self.value = function(agent, tick)
                     --[[if not agent then 
-                        print("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
+                        print("property --> ", intanceName, className, propertyName)
                         assert(false)
                     end]]
                     local val = agent[propertyName]

@@ -86,7 +86,7 @@ function _M:parse(properties)
         end
     end
 
-    return self.m_opl ~= nil
+    return nil ~= self.m_opl
 end
 
 function _M:execute(agent, tick)
