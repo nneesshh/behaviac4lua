@@ -221,8 +221,6 @@ end
 --------------------------------------------------------------------------------
 
 function _M:onEnter(agent, tick)
-    local activeChildIndex = self:getActiveChildIndex(tick)
-    _G.BEHAVIAC_ASSERT(activeChildIndex == constInvalidChildIndex)
     return true
 end
 

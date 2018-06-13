@@ -67,9 +67,13 @@ function _M.loadChildren(selfNode, version, agentType, dataEntry)
         -- children node
         for _, oneChild in ipairs(dataEntry.children) do
             nodeEntry = oneChild[constBaseKeyStrDef.kStrNode]
-            newNode = _M.loadNode(agentType, nodeEntry, version)
-            hasEvents = hasEvents or newNode.m_bHasEvents
-            selfNode:addChild(newNode)
+            if nil ~= nodeEntry then
+                newNode = _M.loadNode(agentType, nodeEntry, version)
+                hasEvents = hasEvents or newNode.m_bHasEvents
+                selfNode:addChild(newNode)
+            else
+                _M.loadCustom(selfNode, version, agentType, oneChild)
+            end
         end
     end
 
@@ -98,8 +102,8 @@ function _M.loadCustom(selfNode, version, agentType, dataEntry)
         return
     end
 
-    local childNode = _M.loadNode(agentType, thisEntry, version)
-    selfNode.m_customCondition = childNode
+    local nodeEntry = thisEntry[constBaseKeyStrDef.kStrNode]
+    selfNode.m_customCondition = _M.loadNode(agentType, nodeEntry, version)
 end
 
 -- 
